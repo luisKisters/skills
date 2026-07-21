@@ -1,0 +1,32 @@
+{
+    "title": "Hyperkey setup (Caps Lock -> Hyper / Cmd+Tab, Right Shift -> Raycast)",
+    "rules": [
+        {
+            "description": "Caps Lock -> Hyper (held + key) / Cmd+Tab (tap)",
+            "manipulators": [{
+                "type": "basic",
+                "from": { "key_code": "caps_lock", "modifiers": { "optional": ["any"] } },
+                "parameters": {
+                    "basic.to_if_alone_timeout_milliseconds": 200,
+                    "basic.to_if_held_down_threshold_milliseconds": 150
+                },
+                "to": [{ "key_code": "left_shift", "lazy": true,
+                         "modifiers": ["left_command", "left_control", "left_option"] }],
+                "to_if_alone": [{ "key_code": "tab", "modifiers": ["left_command"] }]
+            }]
+        },
+        {
+            "description": "Right Shift -> Cmd+Space (tap) / normal shift (held)",
+            "manipulators": [{
+                "type": "basic",
+                "from": { "key_code": "right_shift", "modifiers": { "optional": ["any"] } },
+                "parameters": {
+                    "basic.to_if_alone_timeout_milliseconds": 150,
+                    "basic.to_if_held_down_threshold_milliseconds": 150
+                },
+                "to": [{ "key_code": "right_shift", "lazy": true }],
+                "to_if_alone": [{ "key_code": "spacebar", "modifiers": ["left_command"] }]
+            }]
+        }
+    ]
+}
