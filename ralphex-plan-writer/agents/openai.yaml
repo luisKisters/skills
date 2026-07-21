@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ralphex Plan Writer"
+  short_description: "Write verification-first Ralphex plans"
+  default_prompt: "Use $ralphex-plan-writer to turn this brainstorming note into an executr-ready Ralphex plan."
