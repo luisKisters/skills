@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hyperkey Setup"
+  short_description: "Set up Karabiner Hyperkey shortcuts"
+  default_prompt: "Use $hyperkey-setup to install and configure my Karabiner Hyperkey shortcuts."
