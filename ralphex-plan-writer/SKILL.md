@@ -10,7 +10,6 @@ description: Creates verification-first Ralphex/executr-compatible Markdown impl
 1. Read local execution rules before drafting:
    - target repo `AGENTS.md`, `CLAUDE.md`, and relevant project docs
    - target repo `.ralphex/config` and `.ralphex/prompts/task.txt` when present
-   - `/Users/luiskisters/code/private/projects/executr/README.md`, `AGENTS.md`, or `CLAUDE.md` when available
 2. If the target repo requires current docs for CLIs/libraries, obey that rule before relying on memory.
 3. Survey unresolved product or architecture decisions briefly when they affect task boundaries.
 4. Prefer the minimal implementation that solves the feature or fix and can be verified. If a more complex architecture, broader abstraction, new subsystem, or cross-cutting refactor seems necessary, get explicit user approval before including it in the plan.
