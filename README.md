@@ -14,6 +14,10 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 `concise-comms` enforces concise, ADHD-friendly responses in ASD-STE100 Simplified Technical English or equivalent controlled German and tolerates likely voice-dictation transcription errors. An agent should trigger it when a user asks for shorter or clearer replies, says they have ADHD, says they dictate by voice, asks for Simplified Technical English, or starts any session with this user. Install it with `npx skills add github.com/luisKisters/skills --skill concise-comms`.
 
+## orchestrated-build
+
+`orchestrated-build` executes a written implementation plan with a fleet of agents: one Opus 5 low subagent per vertical slice, each supervising a `codex exec` gpt-5.6-sol run in tmux, with 10-minute check-ins, one review phase, and one end-to-end phase at the end. An agent should trigger it when a user asks to execute or ship a plan, delegate slices to subagents, parallelize a build, or supervise long autonomous runs. Install it with `npx skills add github.com/luisKisters/skills --skill orchestrated-build`.
+
 ## How to install a skill
 
 Install one skill with `npx skills add <repo> --skill <name>`. For this repository, replace `<repo>` with `github.com/luisKisters/skills` and `<name>` with the skill name shown above.
