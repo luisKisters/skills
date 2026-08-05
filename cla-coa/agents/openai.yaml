@@ -1,4 +1,0 @@
-interface:
-  display_name: "Claude and Codex Auto"
-  short_description: "Install cla and coa auto-mode launchers"
-  default_prompt: "Use $cla-coa to install and verify the cla and coa launchers."
