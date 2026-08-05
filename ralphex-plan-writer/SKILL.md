@@ -23,7 +23,6 @@ Do not plan work for a system the agent cannot reach or verify end to end.
 1. Read local execution rules before drafting:
    - target repo `AGENTS.md`, `CLAUDE.md`, and relevant project docs
    - target repo `.ralphex/config` and `.ralphex/prompts/task.txt` when present
-   - the executr repo's `README.md`/`AGENTS.md` when checked out locally (`~/code/projects/executr`)
 2. If the target repo requires current docs for CLIs/libraries, obey that rule before relying on memory.
 3. Survey unresolved product or architecture decisions briefly when they affect task boundaries.
 4. Prefer the minimal implementation that solves the feature and can be verified.
