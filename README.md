@@ -2,6 +2,10 @@
 
 This repository is my personal collection of agent skills. Each skill packages focused instructions and any supporting resources an agent needs to carry out a repeatable workflow.
 
+## cla-coa
+
+`cla-coa` installs and verifies portable `cla` and `coa` launchers for macOS and Linux. An agent should trigger it when asked for Claude Auto, Codex Auto, shorter commands for either CLI, or automatic approval launchers. `cla` uses Claude's automatic permission mode, while `coa` disables Codex approval prompts but retains its workspace-write sandbox. Install it with `npx skills add github.com/luisKisters/skills --skill cla-coa`.
+
 ## ralphex-plan-writer
 
 `ralphex-plan-writer` creates verification-first Markdown implementation plans compatible with Ralphex and executr. An agent should trigger it when asked to turn a PRD or brainstorming note into autonomous implementation tasks, design an executr verification loop, or prepare a Ralphex-compatible plan. It emphasizes minimal, approval-gated architecture, deterministic verification, and validation with its bundled format checker. Install it with `npx skills add github.com/luisKisters/skills --skill ralphex-plan-writer`.
