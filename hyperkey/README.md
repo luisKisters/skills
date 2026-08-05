@@ -1,6 +1,6 @@
 # Hyperkey Setup
 
-This skill installs or configures Karabiner-Elements with bundled Caps Lock Hyperkey and right Shift launcher shortcuts. An agent triggers it when a user asks for this keyboard setup or asks to restore its specific mappings.
+This skill installs or configures Karabiner-Elements with bundled Caps Lock Hyperkey and right Shift launcher shortcuts. An agent triggers it when a user asks for this keyboard setup or asks to restore its specific mappings. The complete configuration is bundled in `hyperkey.json`; the skill does not download rules or configuration data.
 
 ## Install
 

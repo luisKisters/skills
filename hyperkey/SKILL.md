@@ -12,6 +12,7 @@ Follow this workflow in order. Prefer shell commands for every action they can p
 - Always ask before installing software or overwriting a file.
 - Never modify `~/.config/karabiner/karabiner.json` directly. Only write to `~/.config/karabiner/assets/complex_modifications/`.
 - Copy the bundled `hyperkey.json`; do not regenerate or rewrite its contents.
+- Never fetch rules or configuration data from the network. The bundled `hyperkey.json` contains all required mappings.
 
 ## 1. Check Karabiner-Elements
 
