@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orchestrated Build"
+  short_description: "Execute a plan with a fleet of agents"
+  default_prompt: "Use $orchestrated-build to execute this plan with subagents running codex in tmux."

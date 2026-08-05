@@ -5,23 +5,33 @@ description: Creates verification-first Ralphex/executr-compatible Markdown impl
 
 # Ralphex Plan Writer
 
+Plans written here are executed by the `orchestrated-build` skill. Write for that executor.
+
+## Preflight
+
+Before drafting, confirm the executor has:
+
+- orchestration tools, end-to-end test runner, and a CLI for every external system in scope
+- prefer CLIs; if a connected MCP already covers the job, use it instead of asking for a CLI
+- missing tool: give the user the exact install command. Never use computer-use to install
+- needs auth: offer to open the browser at the right page so the user only approves and pastes back a device code
+
+Do not plan work for a system the agent cannot reach or verify end to end.
+
 ## Workflow
 
 1. Read local execution rules before drafting:
    - target repo `AGENTS.md`, `CLAUDE.md`, and relevant project docs
    - target repo `.ralphex/config` and `.ralphex/prompts/task.txt` when present
-   - `/Users/luiskisters/code/private/projects/executr/README.md`, `AGENTS.md`, or `CLAUDE.md` when available
+   - the executr repo's `README.md`/`AGENTS.md` when checked out locally (`~/code/projects/executr`)
 2. If the target repo requires current docs for CLIs/libraries, obey that rule before relying on memory.
 3. Survey unresolved product or architecture decisions briefly when they affect task boundaries.
-4. Prefer the minimal implementation that solves the feature or fix and can be verified. If a more complex architecture, broader abstraction, new subsystem, or cross-cutting refactor seems necessary, get explicit user approval before including it in the plan.
+4. Prefer the minimal implementation that solves the feature and can be verified.
 5. Put harness engineering first when autonomous verification is weak: deterministic fixtures, seed/cleanup commands, auth path, browser state isolation, and non-external test seams.
 6. Write the plan as executable work, not prose-only strategy.
-7. Validate the plan format with `scripts/check_plan_format.py <plan.md>` before handing it back.
-8. If the user says the plan is good, approved, LGTM, or equivalent, ask whether the plan should be pushed to `main`. Do not push until the user explicitly confirms.
+7. Validate with `python3 <skill-dir>/scripts/check_plan_format.py <plan.md>` before handing it back.
 
 ## Plan Shape
-
-Use this structure:
 
 ```md
 # Feature Name
@@ -38,6 +48,9 @@ Locked decisions the executor must not reopen.
 ## Architecture Decisions
 Concrete implementation direction.
 
+## Models
+Orchestrator, subagent, and Codex model for this plan.
+
 ## Verification Contract
 How the agent can prove the work without fake success.
 
@@ -46,14 +59,38 @@ How the agent can prove the work without fake success.
 - `pnpm build`
 - `pnpm test`
 
+## Phase 1: Slice Name
 ### Task 1: First Executable Slice
 - [ ] Do one coherent iteration.
 - [ ] Add or update tests.
 - [ ] Run relevant validation.
+
+## Phase 2: Review
+### Task 2: Review Pass
+- [ ] Delete code that is bad, not best practice, or never asked for.
+- [ ] Cut redundant tests; keep one per acceptance criterion.
+
+## Phase 3: End-to-End
+### Task 3: Full Product Run
+- [ ] Run the whole product against the real interfaces named above.
+- [ ] Fix only what the run breaks.
 ```
+
+## Phases
+
+- One phase = one vertical slice = one feature cut through backend, frontend, and database or external API, independently testable.
+- Plan all slice phases first. Then exactly one review phase. Then exactly one end-to-end phase, at the end and nowhere else.
+- Review phase: remove code that is bad, not best practice, or never asked for. Scrutinize tests hardest — correct tests, not many.
+- Keep `### Task N:` numbering global and sequential across phases.
+
+## Models
+
+Name the models in the plan. Default: Opus 5 high or Fable high orchestrates, Opus 5 low subagents, `codex exec` gpt-5.6-sol at medium. Codex-only environment: gpt-5.6-sol orchestrates.
 
 ## Ralphex Rules
 
+- Test-driven, but plan the smallest test set that proves the slice.
+- If a task loops or grows more complex than the goal needs, stop and reflect before continuing.
 - Store executable plans under `docs/plans/*.md` unless the repo config says otherwise.
 - Include `## Validation Commands`.
 - Use task headings exactly like `### Task N:` or `### Iteration N:`.
