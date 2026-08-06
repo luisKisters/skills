@@ -1,4 +1,0 @@
-interface:
-  display_name: "Concise Comms"
-  short_description: "Keep replies concise, clear, and easy to scan"
-  default_prompt: "Use $concise-comms to make all replies concise, clear, and easy to scan."
