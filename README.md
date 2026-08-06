@@ -12,7 +12,7 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 ## stop-yapping
 
-`stop-yapping` stops rambling while keeping responses short, clear, self-contained, and complete. An agent should trigger it when a user says the agent is yapping, rambling, too verbose, or unclear, or asks for shorter, direct, ADHD-friendly communication. Install it with `npx skills add github.com/luisKisters/skills --skill stop-yapping`.
+`stop-yapping` stops rambling while keeping responses short, clear, self-contained, and complete. An agent should trigger it when a user says the agent is yapping, rambling, too verbose, or unclear, or asks for shorter, direct, ADHD-friendly communication. If invoked alone, it answers the user's previous substantive message with these rules. Install it with `npx skills add github.com/luisKisters/skills --skill stop-yapping`.
 
 ## orchestrated-build
 

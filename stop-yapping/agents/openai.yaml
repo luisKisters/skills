@@ -1,4 +1,4 @@
 interface:
   display_name: "Stop Yapping"
   short_description: "Stop yapping without losing needed context"
-  default_prompt: "Use $stop-yapping to make the response shorter, clearer, and self-contained."
+  default_prompt: "Use $stop-yapping to answer my previous message with a shorter, clearer, self-contained response."

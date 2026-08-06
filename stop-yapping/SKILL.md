@@ -1,6 +1,6 @@
 ---
 name: stop-yapping
-description: Forces short, clear, self-contained responses without omitting answers, requested points, relevant context, or necessary clarification questions. Use when the user says the agent is yapping, rambling, too verbose, or overexplaining, or asks it to stop yapping, be shorter, clearer, more direct, or easier to scan; also use when the user mentions ADHD or requests ASD-STE100 Simplified Technical English or controlled German.
+description: Forces short, clear, self-contained responses without omitting answers, requested points, relevant context, or necessary clarification questions. If invoked alone, answers the user's previous substantive message using these rules. Use when the user says the agent is yapping, rambling, too verbose, or overexplaining, asks it to stop yapping, be shorter, clearer, more direct, or easier to scan, invokes this skill after another request, mentions ADHD, or requests ASD-STE100 Simplified Technical English or controlled German.
 ---
 
 # Stop Yapping
@@ -24,3 +24,7 @@ description: Forces short, clear, self-contained responses without omitting answ
 - Stay on the current task. Leave out side topics.
 - Use available tools instead of asking the user to do your work.
 - If work remains, end with one clear next step. If the work is complete, briefly state what now works.
+
+## When Called Alone
+
+If the current user message only invokes this skill, answer the user's previous substantive message. Do not reply to the skill invocation itself. Apply all communication and response rules above to the answer.

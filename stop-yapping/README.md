@@ -1,6 +1,6 @@
 # Stop Yapping
 
-This skill stops agent rambling while keeping every response short, clear, self-contained, and complete. It triggers when a user says the agent is yapping, rambling, too verbose, or unclear, or asks for shorter, direct, ADHD-friendly communication.
+This skill stops agent rambling while keeping every response short, clear, self-contained, and complete. It triggers when a user says the agent is yapping, rambling, too verbose, or unclear, or asks for shorter, direct, ADHD-friendly communication. If the user invokes the skill alone, it answers the user's previous substantive message with these rules.
 
 ## Install
 
