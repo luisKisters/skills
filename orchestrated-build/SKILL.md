@@ -9,13 +9,13 @@ You are the orchestrator. Do not write feature code yourself.
 
 ## 1. Preflight: tools
 
-Before any work, check the tools needed for orchestration, end-to-end testing, and every external system the plan touches (DB, cloud, payment, auth, CI).
+Before any work, map each acceptance criterion to evidence, then check every tool, permission, credential, approval, environment, and human action needed for orchestration, implementation, verification, and each external system the plan touches.
 
 - Check with `command -v <tool>`. Required baseline: `codex`, `tmux`, `git`.
 - Prefer CLIs. If a connected MCP already covers the job, use it and skip the CLI.
 - If something is missing, print the exact install command for the user to run. Never use computer-use to install.
 - For auth, offer to open the browser at the right page; the user approves and pastes the device code back.
-- Do not start phase work until every gap is closed or the user waives it.
+- Do not start phase work until every gap is closed. If the user refuses or defers required access, state the exact blocked work, evidence, and failure risk; never treat a request to skip verification as a waiver or lower the completion criteria.
 
 ## 2. Preflight: orchestrator model
 
@@ -78,6 +78,7 @@ On a hit: kill the session, correct the brief, relaunch. Report to the user what
 On `blocked`: relaunch once with the blocker in the brief. Still blocked, stop that slice and ask the user. Stop any slice that runs 90 minutes without a verified step.
 
 Tick the plan's `- [ ]` items as each slice verifies.
+Use a verification ladder: run the smallest relevant checks after each edit and slice, parallelize independent checks, then run the full project gates once after merge; require fresh evidence for every acceptance criterion and never trust agent reports alone.
 
 ## 6. Review phase (once, after ALL slices)
 
@@ -85,7 +86,7 @@ Run this pass yourself, one pass across everything, not per slice. Remove code t
 
 ## 7. End-to-end phase (once, last)
 
-Run this yourself: one end-to-end run of the whole product against the real interfaces the plan named. Fix only what it breaks.
+Run this yourself: one end-to-end run of the whole product against the real interfaces the plan named. Collect evidence for every acceptance criterion; if a required interface is unavailable, keep the task open. Fix only what it breaks.
 
 ## 8. Docs
 
