@@ -1,6 +1,6 @@
 # Ralphex Plan Writer
 
-This skill creates verification-first Markdown implementation plans for Ralphex and executr. An agent triggers it when a user asks to convert a PRD or brainstorming note into autonomous implementation tasks or requests a Ralphex-compatible plan.
+This skill creates verification-first Markdown implementation plans for [Ralphex](https://github.com/umputun/ralphex) and [executr](https://github.com/luiskisters/executr). An agent triggers it when a user asks to convert a PRD or brainstorming note into autonomous implementation tasks or requests a Ralphex-compatible plan.
 
 ## Install
 
