@@ -1,0 +1,4 @@
+interface:
+  display_name: "Install Block rm Hook"
+  short_description: "Install a global Claude Code rm safety hook"
+  default_prompt: "Use $install-block-rm-hook to install and verify the global Claude Code rm safety hook."

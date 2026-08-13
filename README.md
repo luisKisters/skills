@@ -18,6 +18,10 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 `orchestrated-build` executes a written implementation plan with a fleet of agents: one Opus 5 low subagent per vertical slice, each supervising a `codex exec` gpt-5.6-sol run in tmux, with 10-minute check-ins, one review phase, and one end-to-end phase at the end. An agent should trigger it when a user asks to execute or ship a plan, delegate slices to subagents, parallelize a build, or supervise long autonomous runs. Install it with `npx skills add github.com/luisKisters/skills --skill orchestrated-build`.
 
+## install-block-rm-hook
+
+`install-block-rm-hook` installs and verifies a global Claude Code `PreToolUse` hook that blocks direct `rm` commands and points the agent to `trash <path>`. It permits `git rm` and the `rm` subcommands of npm, yarn, and pnpm. Install it with `npx skills add github.com/luisKisters/skills --skill install-block-rm-hook`.
+
 ## How to install a skill
 
 Install one skill with `npx skills add <repo> --skill <name>`. For this repository, replace `<repo>` with `github.com/luisKisters/skills` and `<name>` with the skill name shown above.
