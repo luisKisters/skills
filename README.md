@@ -16,7 +16,7 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 ## orchestrated-build
 
-`orchestrated-build` executes a written implementation plan with a fleet of agents: one Opus 5 low subagent per vertical slice, each supervising Luna Max implementation runs in tmux, with 10-minute check-ins, one review phase before the end-to-end phase, and a human-gated merge. Below roughly 50 changed lines it deliberately does not fan out at all. An agent should trigger it when a user asks to execute or ship a plan, delegate slices to subagents, parallelize a build, or supervise long autonomous runs. Install it with `npx skills add github.com/luisKisters/skills --skill orchestrated-build`.
+`orchestrated-build` executes a written implementation plan with a fleet of agents: one Opus 5 low subagent per vertical slice, each spawning Luna Max as a native Codex subagent through the Codex plugin, with regular check-ins, one review phase before the end-to-end phase, and a human-gated merge. Below roughly 50 changed lines it deliberately does not fan out at all. An agent should trigger it when a user asks to execute or ship a plan, delegate slices to subagents, parallelize a build, or supervise long autonomous runs. Install it with `npx skills add github.com/luisKisters/skills --skill orchestrated-build`.
 
 ## pr-insights-automation
 

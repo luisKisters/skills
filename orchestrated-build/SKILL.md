@@ -1,6 +1,6 @@
 ---
 name: orchestrated-build
-description: Executes a written implementation plan by fanning out one Opus 5 low subagent per vertical slice, each supervising Luna Max implementation runs in tmux, with 10-minute check-ins, one review phase before the end-to-end phase, and a human-gated merge. Use when the user asks to execute or ship a plan, orchestrate agents, delegate slices to subagents, run codex exec in tmux, parallelize a build, or babysit long autonomous runs.
+description: Executes a written implementation plan by fanning out one Opus 5 low subagent per vertical slice, each spawning Luna Max as a native Codex subagent through the Codex plugin, with regular check-ins, one review phase before the end-to-end phase, and a human-gated merge. Use when the user asks to execute or ship a plan, orchestrate agents, delegate slices to subagents, run Codex subagents, parallelize a build, or babysit long autonomous runs.
 ---
 
 # Orchestrated Build
@@ -20,7 +20,7 @@ The 50-line threshold is a rule of thumb, not a measured result. Say so if the u
 
 Before any work, map each acceptance criterion to evidence, then check every tool, permission, credential, approval, environment, and human action needed for orchestration, implementation, verification, and each external system the plan touches.
 
-- Check with `command -v <tool>`. Required baseline: `codex`, `tmux`, `git`.
+- Check with `command -v <tool>`. Required baseline: `git`, plus the Codex plugin for Claude Code. Only the detached fallback in section 5 needs `codex` and `tmux` on PATH.
 - Prefer CLIs. If a connected MCP already covers the job, use it and skip the CLI.
 - If something is missing, print the exact install command for the user to run. Never use computer-use to install.
 - For auth, offer to open the browser at the right page; the user approves and pastes the device code back.
@@ -34,7 +34,7 @@ A preflight check finds the missing credential now instead of at 3am, twenty min
 | --- | --- |
 | Orchestrator, this session | Fable 5 high, or Opus 5 high |
 | Supervises one slice | Opus 5 low subagent |
-| Implements | Luna Max, through the Codex plugin |
+| Implements | Luna Max, as a native Codex subagent through the Codex plugin |
 
 Variants when only one provider is available:
 
@@ -54,11 +54,27 @@ Read the plan in `docs/plans/`. One `## Phase N:` = one slice; its `### Task N:`
 
 ## 5. Fan out one subagent per slice
 
-Launch subagents in parallel wherever slices are independent. One subagent = one slice = Opus 5 **low**. Its only job is to launch and supervise an implementation run.
+Launch subagents in parallel wherever slices are independent. One subagent = one slice = Opus 5 **low**. Its only job is to spawn and supervise Luna Max implementation subagents.
 
 Give each parallel slice its own `git worktree add /tmp/ob/$SLICE/wt <branch>` and point `-C` at it. Merge into the main branch as each slice lands. Run a dependent slice only after its dependency merges.
 
-Give each subagent this literal shape:
+### Launch Luna as a native Codex subagent
+
+**This is the path. Use it.** The Codex plugin for Claude Code exposes Luna as a real subagent, so the supervising Opus 5 low agent spawns it directly. No tmux, no `codex exec`, no log tailing, no orphaned panes.
+
+What each supervising subagent does:
+
+1. Confirm the plugin is available. If it is not, tell the user to install it rather than working around it, and do not fall back silently.
+2. Spawn a Codex subagent per task in its slice, model `gpt-5.6-luna` at `max` effort, scoped to that slice's worktree.
+3. Pass the slice brief as the subagent prompt: goal, files in scope, the acceptance test, and the verification command to run before reporting done.
+4. Read the returned result directly. The subagent's final message **is** the return value, so there is nothing to parse out of a log.
+5. Re-spawn with a corrected brief when the result drifts. A fresh subagent is cheaper than arguing with a stuck one.
+
+Because the run is a subagent rather than a detached process, the orchestrator gets structured results back instead of scraping stdout, and a finished turn cannot leave a run orphaned.
+
+### Fallback only: detached runs for work that outlives the session
+
+Use this **only** when the plugin is unavailable, or when a single slice is expected to run for many hours across quota resets and must survive the session ending.
 
 ```sh
 SLICE=slice-01
@@ -74,8 +90,6 @@ tmux new-session -d -s "$SLICE" \
      -o /tmp/ob/$SLICE/last.md \
      - < /tmp/ob/$SLICE/prompt.md 2>&1 | tee /tmp/ob/$SLICE/run.log"
 ```
-
-The Codex plugin for Claude Code is the preferred path when it is installed; `codex exec` above is the fallback and is what the polling commands assume.
 
 Keep stdout on the pane through `tee`. Redirecting all three fds kills the pane at once, and every slice then reports done instantly.
 
@@ -94,20 +108,20 @@ Subagent rules:
 - Tests are written during execution, never bolted on afterwards.
 - If you loop, or write more code than the task needs, stop and reflect. Pass this rule down in every slice brief.
 
-For runs that outlast a session, use either a Ralph loop, which starts one fresh session per phase and therefore cannot stall asking whether to continue, or a single session with a watcher script that restarts it. Both exist to survive quota resets and overnight crashes.
+For work that outlasts a session entirely, use either a Ralph loop, which starts one fresh session per phase and therefore cannot stall asking whether to continue, or a single session with a watcher script that restarts it. Both exist to survive quota resets and overnight crashes, and both use the detached fallback above rather than native subagents.
 
-## 6. Check in every 10 minutes
+## 6. Check in as each result lands, and every 10 minutes on detached runs
 
-For each running session, read the tail of its log and look for:
+With native subagents you read each returned result as it arrives. With the detached fallback, poll the log tail every ten minutes. Either way, look for:
 - a stuck loop (same file, same error, or same command repeating)
 - drift off the slice brief
 - features nobody asked for
 - code that is more complex or more verbose than the task needs
 - tests being added in bulk instead of per acceptance criterion
 
-On a hit: kill the session, correct the brief, relaunch. Report to the user what you cut and why.
+On a hit: stop that run, correct the brief, re-spawn. Report to the user what you cut and why. A fresh subagent is cheaper than arguing with a stuck one.
 
-On `blocked`: relaunch once with the blocker in the brief. Still blocked, stop that slice and ask the user. Stop any slice that runs 90 minutes without a verified step.
+On `blocked`: re-spawn once with the blocker in the brief. Still blocked, stop that slice and ask the user. Stop any slice that runs 90 minutes without a verified step.
 
 Tick the plan's `- [ ]` items as each slice verifies. Use a verification ladder: run the smallest relevant checks after each edit and slice, parallelize independent checks, then run the full project gates once after merge. Require fresh evidence for every acceptance criterion and never trust agent reports alone.
 
