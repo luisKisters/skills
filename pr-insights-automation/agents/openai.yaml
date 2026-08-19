@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Insights Automation"
+  short_description: "Automate PR reports, Pages publishing and graph refresh"
+  default_prompt: "Use $pr-insights-automation to audit this repo's PR report pipeline and make the graph refresh and HTML publication automatic."

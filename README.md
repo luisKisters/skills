@@ -4,7 +4,7 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 ## ralphex-plan-writer
 
-`ralphex-plan-writer` creates verification-first Markdown implementation plans compatible with Ralphex and executr. An agent should trigger it when asked to turn a PRD or brainstorming note into autonomous implementation tasks, design an executr verification loop, or prepare a Ralphex-compatible plan. It emphasizes minimal, approval-gated architecture, deterministic verification, and validation with its bundled format checker. Install it with `npx skills add github.com/luisKisters/skills --skill ralphex-plan-writer`.
+`ralphex-plan-writer` creates verification-first Markdown implementation plans compatible with Ralphex and executr. An agent should trigger it when asked to turn a PRD or brainstorming note into autonomous implementation tasks, plan a UI change, design an executr verification loop, or prepare a Ralphex-compatible plan. It decides how much plan the change earns before writing one, plans UI in HTML mockups with locked decisions before converting to Markdown, writes the verification while the code still does not exist, and validates the result with its bundled format checker. Install it with `npx skills add github.com/luisKisters/skills --skill ralphex-plan-writer`.
 
 ## hyperkey-setup
 
@@ -16,7 +16,11 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 ## orchestrated-build
 
-`orchestrated-build` executes a written implementation plan with a fleet of agents: one Opus 5 low subagent per vertical slice, each supervising a `codex exec` gpt-5.6-sol run in tmux, with 10-minute check-ins, one review phase, and one end-to-end phase at the end. An agent should trigger it when a user asks to execute or ship a plan, delegate slices to subagents, parallelize a build, or supervise long autonomous runs. Install it with `npx skills add github.com/luisKisters/skills --skill orchestrated-build`.
+`orchestrated-build` executes a written implementation plan with a fleet of agents: one Opus 5 low subagent per vertical slice, each supervising Luna Max implementation runs in tmux, with 10-minute check-ins, one review phase before the end-to-end phase, and a human-gated merge. Below roughly 50 changed lines it deliberately does not fan out at all. An agent should trigger it when a user asks to execute or ship a plan, delegate slices to subagents, parallelize a build, or supervise long autonomous runs. Install it with `npx skills add github.com/luisKisters/skills --skill orchestrated-build`.
+
+## pr-insights-automation
+
+`pr-insights-automation` makes a PR Insights style review pipeline automatic: a report on every pull request, published to a stable URL instead of a downloadable artifact, and an architecture graph that refreshes itself when a pull request merges. An agent should trigger it when a user asks to automate PR reports, publish CI artifacts to GitHub Pages, stop hand-running `refresh-docs`, auto-update an architecture graph, replace a label-gated report workflow, or turn on a CI analyzer safely. It keeps one constraint throughout: pull request code never runs in a job that has secrets or write permissions. Install it with `npx skills add github.com/luisKisters/skills --skill pr-insights-automation`.
 
 ## How to install a skill
 
