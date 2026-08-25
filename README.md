@@ -26,6 +26,10 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 `install-block-rm-hook` installs and verifies a global Claude Code `PreToolUse` hook that blocks direct `rm` commands and points the agent to `trash <path>`. It permits `git rm` and the `rm` subcommands of npm, yarn, and pnpm. Install it with `npx skills add github.com/luisKisters/skills --skill install-block-rm-hook`.
 
+## eliminate-the-correction
+
+`eliminate-the-correction` turns a correction of the agent into a permanent fix. An agent should trigger it when a user corrects it, says it keeps repeating a mistake, or asks for a guardrail, rule, hook, lint rule, or regression test so the mistake never happens again. It names the class of mistake, then climbs a value ladder: categorically eliminate the problem through architecture or data structures, else make CI catch it with a lint rule or test, else write it into a skill or rule file, and treat human review as the failure case. Install it with `npx skills add github.com/luisKisters/skills --skill eliminate-the-correction`.
+
 ## How to install a skill
 
 Install one skill with `npx skills add <repo> --skill <name>`. For this repository, replace `<repo>` with `github.com/luisKisters/skills` and `<name>` with the skill name shown above.

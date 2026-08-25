@@ -1,0 +1,4 @@
+interface:
+  display_name: "Eliminate the Correction"
+  short_description: "Turn a correction into a permanent guardrail"
+  default_prompt: "Use $eliminate-the-correction to fix what I just corrected and then remove the whole class of mistake."
