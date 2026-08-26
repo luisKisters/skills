@@ -14,6 +14,10 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 `stop-yapping` stops rambling while keeping responses short, clear, self-contained, and complete. An agent should trigger it when a user says the agent is yapping, rambling, too verbose, or unclear, or asks for shorter, direct, ADHD-friendly communication. If invoked alone, it answers the user's previous substantive message with these rules. Install it with `npx skills add github.com/luisKisters/skills --skill stop-yapping`.
 
+## overnight-preflight
+
+`overnight-preflight` proves a repository can run unattended before the user walks away, and surfaces only the decisions a human genuinely must make. An agent should trigger it when the user is about to leave a long autonomous run going, says they are going to sleep, worries about password prompts, expired tokens or permission dialogs stopping a run, asks for a readiness check, or hands a long task to subagents. It probes every external dependency for real rather than trusting configuration, times out every command, never prompts or uses `sudo`, classifies each result as OK, DEGRADED or BLOCKED, and refuses to ask about speculative risks. Install it with `npx skills add github.com/luisKisters/skills --skill overnight-preflight`.
+
 ## orchestrated-build
 
 `orchestrated-build` executes a written implementation plan with a fleet of agents: one Opus 5 low subagent per vertical slice, each spawning Luna Max as a native Codex subagent through the Codex plugin, with regular check-ins, one review phase before the end-to-end phase, and a human-gated merge. Below roughly 50 changed lines it deliberately does not fan out at all. An agent should trigger it when a user asks to execute or ship a plan, delegate slices to subagents, parallelize a build, or supervise long autonomous runs. Install it with `npx skills add github.com/luisKisters/skills --skill orchestrated-build`.

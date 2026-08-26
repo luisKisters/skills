@@ -1,0 +1,3 @@
+display_name: Overnight Preflight
+short_description: Prove a repository can run unattended, and surface only the decisions a human must make.
+default_prompt: Run an overnight preflight on this repository. Probe every external dependency for real, classify each result OK, DEGRADED or BLOCKED, and list only the decisions I genuinely have to make before I go to sleep.
