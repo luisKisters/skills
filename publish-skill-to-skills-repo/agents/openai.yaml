@@ -1,0 +1,4 @@
+interface:
+  display_name: "Publish Skill to Skills Repo"
+  short_description: "Add or update a skill in github.com/luisKisters/skills"
+  default_prompt: "Use $publish-skill-to-skills-repo to add this workflow as a skill in my skills repo."

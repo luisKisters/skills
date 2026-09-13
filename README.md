@@ -34,6 +34,10 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 `eliminate-the-correction` turns a correction of the agent into a permanent fix. An agent should trigger it when a user corrects it, says it keeps repeating a mistake, or asks for a guardrail, rule, hook, lint rule, or regression test so the mistake never happens again. It names the class of mistake, then climbs a value ladder: categorically eliminate the problem through architecture or data structures, else make CI catch it with a lint rule or test, else write it into a skill or rule file, and treat human review as the failure case. Install it with `npx skills add github.com/luisKisters/skills --skill eliminate-the-correction`.
 
+## publish-skill-to-skills-repo
+
+`publish-skill-to-skills-repo` adds or updates a skill in this repository and verifies it before pushing. An agent should trigger it when asked to publish a skill, add a workflow to the skills repo, save a workflow as a skill for the repo, or update a skill in `github.com/luisKisters/skills`. It enforces the directory layout and frontmatter conventions, writes the short README and optional OpenAI/Codex metadata, lists the skill in the root README, validates the result, and commits and pushes on the correct branch. Install it with `npx skills add github.com/luisKisters/skills --skill publish-skill-to-skills-repo`.
+
 ## How to install a skill
 
 Install one skill with `npx skills add <repo> --skill <name>`. For this repository, replace `<repo>` with `github.com/luisKisters/skills` and `<name>` with the skill name shown above.
