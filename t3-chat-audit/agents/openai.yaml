@@ -1,0 +1,4 @@
+interface:
+  display_name: "T3 Chat Audit"
+  short_description: "Audit and archive stale T3 Code chats safely"
+  default_prompt: "Use $t3-chat-audit to report which of my T3 Code chats are safe to archive."

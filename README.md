@@ -43,3 +43,7 @@ This repository is my personal collection of agent skills. Each skill packages f
 Install one skill with `npx skills add <repo> --skill <name>`. For this repository, replace `<repo>` with `github.com/luisKisters/skills` and `<name>` with the skill name shown above.
 
 If the CLI is unavailable, clone or download the repository and manually copy the selected skill directory into your agent's skills directory, for example `cp -R <skill-directory> ~/.codex/skills/<name>`.
+
+## t3-chat-audit
+
+`t3-chat-audit` audits all active T3 Code chats from the local state database, classifies stale chats (tests, greetings, duplicates, finished one-offs), applies hard safety gates such as no linked pull requests and no pending work, and archives only approved chats with a verified SQL update. An agent should trigger it when a user asks to review, tidy, prune, or archive their T3 Code chats or asks which chats are no longer needed. Install it with `npx skills add github.com/luisKisters/skills --skill t3-chat-audit`.
