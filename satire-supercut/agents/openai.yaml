@@ -1,0 +1,4 @@
+interface:
+  display_name: "Satire Supercut"
+  short_description: "Parody YTP from a creator's real words, labeled as satire"
+  default_prompt: "Use $satire-supercut to make a short, dry parody supercut of <creator> where every word is really theirs."

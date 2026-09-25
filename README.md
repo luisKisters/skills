@@ -38,6 +38,10 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 `publish-skill-to-skills-repo` adds or updates a skill in this repository and verifies it before pushing. An agent should trigger it when asked to publish a skill, add a workflow to the skills repo, save a workflow as a skill for the repo, or update a skill in `github.com/luisKisters/skills`. It enforces the directory layout and frontmatter conventions, writes the short README and optional OpenAI/Codex metadata, lists the skill in the root README, validates the result, and commits and pushes on the correct branch. Install it with `npx skills add github.com/luisKisters/skills --skill publish-skill-to-skills-repo`.
 
+## satire-supercut
+
+`satire-supercut` makes a short, clearly labeled parody video (a YTP or sentence-mix supercut) in which a creator "says" a new script built only from their real words. An agent should trigger it when a user asks for a YTP, YouTube Poop, supercut, sentence-mix, or "make <creator> say <thing>" edit. It indexes auto-captions, downloads only the needed clip sections, finds clean cut points with ASR word timings and an audio energy profile, burns in captions and a `parody` tag, and verifies the final cut by transcribing it. It is for satire only: jokes must be obviously absurd and every frame is labeled. Install it with `npx skills add github.com/luisKisters/skills --skill satire-supercut`.
+
 ## How to install a skill
 
 Install one skill with `npx skills add <repo> --skill <name>`. For this repository, replace `<repo>` with `github.com/luisKisters/skills` and `<name>` with the skill name shown above.
