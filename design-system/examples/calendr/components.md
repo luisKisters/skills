@@ -1,4 +1,4 @@
-# Components and patterns
+# Components and patterns (Calendr example)
 Each spec uses the tokens and styles in `foundations.md`. Sizes are in points.
 ## Segmented control
 One control for Day/Week/Month, Going? and the settings switches. Swift: one `Segmented` in `Components.swift`.

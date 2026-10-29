@@ -1,4 +1,0 @@
-interface:
-  display_name: "Calendr Design"
-  short_description: "Build Calendr SwiftUI screens that match the v4 design system"
-  default_prompt: "Use $calendr-design to build or check this Calendr view against the v4 design system."

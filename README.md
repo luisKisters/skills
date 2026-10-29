@@ -42,9 +42,9 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 `satire-supercut` makes a short, clearly labeled parody video (a YTP or sentence-mix supercut) in which a creator "says" a new script built only from their real words. An agent should trigger it when a user asks for a YTP, YouTube Poop, supercut, sentence-mix, or "make <creator> say <thing>" edit. It indexes auto-captions, downloads only the needed clip sections, finds clean cut points with ASR word timings and an audio energy profile, burns in captions and a `parody` tag, and verifies the final cut by transcribing it. It is for satire only: jokes must be obviously absurd and every frame is labeled. Install it with `npx skills add github.com/luisKisters/skills --skill satire-supercut`.
 
-## calendr-design
+## design-system
 
-`calendr-design` is the design system of Calendr, a native macOS calendar app in SwiftUI, written in the form of the Vercel Geist docs: foundations, materials, components and patterns. An agent should trigger it when it adds, changes or reviews a view in `Sources/Calendr/Views`, or is asked to match the v4 mockup or check a Calendr screen. It gives every locked v4 value with its SwiftUI mapping, the event reply states, the two-lane overlap layout and the alignment rules, and ends with a check list. Install it with `npx skills add github.com/luisKisters/skills --skill calendr-design`.
+`design-system` holds the format and the workflow for a design system, so anyone can put their own in. The format follows the Vercel Geist docs: sources and principles, foundations (colours by role, text styles, materials, layout) and component specs. An agent should trigger it when it builds, changes or reviews UI, or is asked to apply, check, create or extract a design system. It uses the project's `design-system/` folder first, then a personal default in the skill's `system/` folder, and never invents values. It ships empty templates and a filled Calendr example. Install it with `npx skills add github.com/luisKisters/skills --skill design-system`.
 
 ## How to install a skill
 

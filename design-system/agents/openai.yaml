@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design System"
+  short_description: "Build UI from your own design system, or create one in a Geist-style format"
+  default_prompt: "Use $design-system to build or check this screen against the active design system."

@@ -1,4 +1,4 @@
-# Foundations
+# Foundations (Calendr example)
 Theme: OLED black with the ink accent. Only the dark theme is locked. Light mode keeps the current Paper values in `Theme.swift`. Do not invent light values.
 
 `mix(a, b, t)` moves colour `a` the fraction `t` toward `b`. "fg 6.5 %" is `fg` at 6.5 % opacity.
