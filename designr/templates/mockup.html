@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product mockup</title>
+<!-- designr starter. Replace the app part (tokens, demo data, app()). Keep the picker part. -->
+<style>
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: #08080a; color: #d8d8dc; font: 13px/1.4 -apple-system, system-ui, sans-serif; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: inherit; padding: 0; }
+input { font: inherit; color: inherit; background: none; border: 0; outline: 0; }
+#root { display: flex; height: 100%; }
+#stage { flex: 1; position: relative; overflow: hidden; }
+.shot #picker { display: none; }
+
+/* ---------- picker (outside the app) ---------- */
+#picker { width: 380px; flex: none; border-left: 1px solid #222; background: #111113; overflow-y: auto; padding: 18px 18px 40px; }
+#picker h1 { font-size: 15px; font-weight: 650; color: #f2f2f4; margin: 0; }
+#picker h2 { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: #6c6c74; font-weight: 600; margin: 22px 0 8px; }
+#picker .lede { color: #8a8a92; font-size: 12px; margin: 4px 0 14px; }
+.pk-btn { padding: 5px 9px; border-radius: 7px; background: #1b1b1f; color: #b4b4bb; font-size: 12px; border: 1px solid #26262b; }
+.pk-btn:hover { background: #222227; color: #eee; }
+.pk-btn.on { background: #ececf0; color: #111; border-color: #ececf0; }
+.pk-scenes { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.pk-notes { padding: 10px 12px; border-radius: 9px; background: #17171a; border: 1px solid #222226; color: #a6a6ae; font-size: 12px; }
+.pk-notes ul { margin: 0; padding-left: 15px; }
+.pk-ba { display: flex; gap: 4px; align-items: center; margin-bottom: 10px; }
+.pk-ba span { color: #6c6c74; font-size: 11px; margin-left: 4px; }
+.pk-tog { display: flex; gap: 8px; align-items: center; color: #a6a6ae; font-size: 12px; margin-top: 6px; }
+.pk-tog i { width: 24px; height: 14px; border-radius: 7px; background: #2a2a30; position: relative; flex: none; }
+.pk-tog i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: #8a8a92; transition: transform .15s; }
+.pk-tog.on i { background: #ececf0; } .pk-tog.on i::after { transform: translateX(10px); background: #111; }
+.pk-audit { margin-top: 8px; color: #8a8a92; font-size: 11.5px; }
+.pk-audit b { color: #eee; }
+.pk-dec { margin-bottom: 14px; }
+.pk-dec > b { color: #f2f2f4; font-size: 12.5px; }
+.pk-dec p { color: #8a8a92; font-size: 12px; margin: 3px 0 6px; }
+.pk-new { color: #a6a6ae; font-size: 12px; margin: 3px 0 6px; }
+.pk-new q { color: #e6e6ea; }
+.pk-opt { display: flex; align-items: center; gap: 8px; width: 100%; padding: 5px 8px; border-radius: 7px; color: #b4b4bb; font-size: 12px; }
+.pk-opt:hover { background: #1b1b1f; color: #eee; }
+.pk-opt.on { color: #f4f4f6; background: #1d1d22; }
+.pk-opt .r { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #4a4a52; flex: none; }
+.pk-opt.on .r { border-color: #f4f4f6; background: radial-gradient(#f4f4f6 0 2.5px, transparent 3px); }
+.pk-opt .end { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.pk-opt .rec, .pk-opt .lk { font-size: 10.5px; color: #6c6c74; }
+.pk-opt .hq { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #3a3a42; color: #8a8a92; font-size: 10px; display: inline-grid; place-items: center; position: relative; }
+.pk-opt .hq:hover::after { content: attr(data-help); position: absolute; right: -4px; top: 22px; width: 270px; padding: 8px 10px; border-radius: 8px; background: #26262c; border: 1px solid #3a3a42; color: #e6e6ea; font-size: 11.5px; line-height: 1.45; white-space: normal; z-index: 10; }
+.pk-lock { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; padding: 3px 0; color: #8a8a92; }
+.pk-lock b { font-weight: 500; color: #c4c4cb; }
+.pk-foot { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 22px; }
+#picks { margin-top: 10px; width: 100%; height: 150px; background: #141417; color: #bdbdc4; border: 1px solid #25252a; border-radius: 8px; padding: 8px; font: 11px/1.45 ui-monospace, Menlo, monospace; resize: vertical; }
+
+/* ---------- preview outline and alignment guides ---------- */
+.pvhl { outline: 1.5px solid rgba(90, 160, 255, .9) !important; outline-offset: 1px; }
+#guides { position: absolute; inset: 0; pointer-events: none; z-index: 150; }
+#guides .gv { position: absolute; width: 0; border-left: 1px solid rgba(64, 214, 120, .55); }
+#guides .gv.r { border-left-color: rgba(90, 160, 255, .55); }
+#guides .gv span { position: absolute; top: 2px; left: 2px; font: 9px ui-monospace, Menlo, monospace; color: rgba(64, 214, 120, .95); background: rgba(0,0,0,.6); padding: 0 2px; }
+#guides .bx { position: absolute; outline: 1px solid rgba(255, 70, 90, .95); background: rgba(255, 70, 90, .12); }
+#guides .bx span { position: absolute; top: -12px; left: 0; font: 9px ui-monospace, Menlo, monospace; color: #fff; background: rgba(220, 40, 60, .9); padding: 0 3px; white-space: nowrap; }
+#guides .ol { position: absolute; outline: 1px dashed rgba(255, 255, 255, .14); }
+#guides .legend { position: absolute; left: 12px; bottom: 12px; padding: 8px 10px; border-radius: 8px; background: rgba(10,10,12,.88); border: 1px solid rgba(255,255,255,.12); font: 11px/1.5 -apple-system, system-ui; color: #ddd; }
+
+/* ================= the app: replace from here ================= */
+/* Tokens. Every value in the app CSS below is a token. */
+.desk { --bg: #000; --bg2: #141416; --pop: #0c0c0e; --hover: #1a1a1d; --hair: rgba(255,255,255,.08);
+  --fg: #f2f2f4; --fg2: #a1a1a8; --fg3: #6c6c74; --act: #f2f2f4; --onact: #000;
+  --font: -apple-system, system-ui, sans-serif; --fs-title: 18px; --fs-ui: 12.5px; --fs-small: 11.5px;
+  --h-row: 28px; --h-ctl: 32px; --r-row: 6px; --r-ctl: 8px; --r-card: 12px; }
+.desk.accent-blue { --act: #3d7bff; --onact: #fff; }
+.desk { position: absolute; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; background: var(--bg); color: var(--fg); font: var(--fs-ui)/1.4 var(--font); display: flex; -webkit-font-smoothing: antialiased; }
+.side { width: 236px; padding: 12px; border-right: 1px solid var(--hair); }
+.side .nav { display: flex; align-items: center; gap: 8px; height: var(--h-row); padding: 0 8px; margin: 0 -8px; border-radius: var(--r-row); color: var(--fg2); }
+.side .nav:hover, .side .nav.on { background: var(--hover); color: var(--fg); }
+.ic { width: 14px; height: 14px; border-radius: 4px; background: var(--fg3); flex: none; }
+.main { flex: 1; padding: 20px 24px; }
+.hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.hdr h1 { font-size: var(--fs-title); font-weight: 600; margin: 0; }
+.btn { height: var(--h-ctl); padding: 0 12px; border-radius: var(--r-ctl); background: var(--act); color: var(--onact); font-weight: 600; }
+.row { display: flex; align-items: center; gap: 8px; height: var(--h-ctl); padding: 0 8px; margin: 0 -8px; border-radius: var(--r-row); }
+.row:hover { background: var(--hover); }
+.row .meta { margin-left: auto; color: var(--fg2); font-size: var(--fs-small); }
+.rows-lines .row { border-radius: 0; border-bottom: 1px solid var(--hair); }
+.rows-boxed .row { margin: 0 0 4px; background: var(--bg2); border-radius: var(--r-ctl); }
+.card { margin-top: 16px; padding: 12px 16px; border-radius: var(--r-card); background: var(--pop); border: 1px solid var(--hair); }
+.tok { display: flex; align-items: center; gap: 8px; height: var(--h-row); }
+.tok i { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--hair); flex: none; }
+.tok span { color: var(--fg2); font-size: var(--fs-small); margin-left: auto; }
+</style>
+</head>
+<body>
+<div id="root"><div id="stage"><div class="desk" id="desk"></div></div><aside id="picker"></aside></div>
+<script>
+// ================= edit for each round =================
+const PRODUCT = 'Product', VERSION = 'v1', ROUND = 1;
+const DESK = { w: 1440, h: 900 };            // the real window size
+const SCENES = [['home', 'Home'], ['detail', 'Detail'], ['system', 'Design system']];
+const HOWTO = ['Everything is clickable.', 'Keys: G alignment guides, B before / after.', 'The scene buttons only jump to a starting state.'];
+// The picks the user locked. Each round adds the new locks here and in DECISIONS.md.
+const LOCKED = { accent: 'ink' };
+// Values for the Before switch (B): the last round, before the change you show.
+const BEFORE = {};
+// g: group title, id: key, name: what the user sees, fb: the user's words, note: where to look,
+// scene: scene to open on hover, hl: CSS selector of what changes, lock: true when locked,
+// opts: [value, label, help]. The first open option is the recommendation.
+const DECISIONS = [
+  { g: 'Round 1', id: 'rows', name: 'List rows', fb: 'The list looks cluttered.', note: 'Look at the list on Home.', scene: 'home', hl: '.row', opts: [
+    ['plain', 'Plain rows, hover only', 'No lines and no boxes. Hover shows a soft fill that bleeds 8 px, so the text does not move.'],
+    ['lines', 'Hairline between rows', 'A 1 px line under each row. No fill.'],
+    ['boxed', 'A box per row', 'Each row is a raised box with a 4 px gap.'],
+  ] },
+  { id: 'accent', lock: true, name: 'Accent', opts: [['ink', 'Ink', 'Primary buttons are white on black.'], ['blue', 'Blue', 'Primary buttons are blue.']] },
+];
+
+// ================= demo data (invent all of it) =================
+function fresh() {
+  return { sel: null, items: [
+    { id: 1, title: 'Quarterly plan', meta: 'ana@example.com' },
+    { id: 2, title: 'Design review', meta: 'team@example.org' },
+    { id: 3, title: 'Release notes', meta: 'ben@example.com' },
+  ] };
+}
+
+// ================= the app =================
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+function deskClass() { return `accent-${C('accent')} rows-${C('rows')}`; }
+function app() {
+  const nav = SCENES.map(([id, n]) => `<button class="nav ${S.scene === id ? 'on' : ''}" data-go="${id}"><i class="ic"></i>${n}</button>`).join('');
+  let main = '';
+  if (S.scene === 'system') {
+    const cs = getComputedStyle(desk);
+    const toks = ['--bg', '--bg2', '--pop', '--hover', '--fg', '--fg2', '--fg3', '--act'];
+    main = `<div class="hdr"><h1>Design system</h1></div><div class="card">${toks.map(t => `<div class="tok"><i style="background:var(${t})"></i>${t}<span>${cs.getPropertyValue(t).trim()}</span></div>`).join('')}</div>`;
+  } else if (S.scene === 'detail') {
+    const it = A.items.find(x => x.id === A.sel) || A.items[0];
+    main = `<div class="hdr"><h1>${esc(it.title)}</h1><button class="btn">Share</button></div><div class="card"><div class="row"><i class="ic"></i>Owner<span class="meta">${esc(it.meta)}</span></div></div>`;
+  } else {
+    main = `<div class="hdr"><h1>Home</h1><button class="btn" data-a="add">New item</button></div>${A.items.map(it => `<button class="row" style="width:100%" data-open="${it.id}"><i class="ic"></i>${esc(it.title)}<span class="meta">${esc(it.meta)}</span></button>`).join('')}`;
+  }
+  return `<div class="side" data-area="sidebar">${nav}</div><div class="main" data-area="main">${main}</div>`;
+}
+function appClick(t) {
+  if (t.dataset.go) S.scene = t.dataset.go;
+  else if (t.dataset.open) { A.sel = +t.dataset.open; S.scene = 'detail'; }
+  else if (t.dataset.a === 'add') A.items.push({ id: Date.now(), title: 'New item', meta: 'you@example.com' });
+  else return false;
+  return true;
+}
+
+// ================= picker machinery: keep =================
+const KEY = `designr-${PRODUCT}-${VERSION}`;
+let S = null;
+try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+S = S || { c: {}, scene: SCENES[0][0], hover: true };
+DECISIONS.forEach(d => { if (!(d.id in S.c)) S.c[d.id] = d.lock ? LOCKED[d.id] : d.opts[0][0]; });
+let A = fresh(), PV = null;
+const C = id => (S.before && id in BEFORE ? BEFORE[id] : S.c[id]);
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(PV ? { ...S, c: { ...S.c, [PV.id]: PV.orig } } : S)); } catch (e) {} };
+const desk = document.getElementById('desk'), picker = document.getElementById('picker');
+const shot = location.hash.includes('&shot');
+if (shot) document.body.classList.add('shot');
+
+function fit() {
+  const st = document.getElementById('stage').getBoundingClientRect();
+  const k = shot ? 1 : Math.min(st.width / DESK.w, st.height / DESK.h, 1);
+  desk.style.width = DESK.w + 'px'; desk.style.height = DESK.h + 'px';
+  desk.style.transform = `scale(${k})`;
+}
+function render() {
+  desk.className = 'desk ' + deskClass();
+  desk.innerHTML = app();
+  markPreview(); audit(); drawGuides();
+}
+function preset(id) { S.scene = id; A.sel = null; save(); renderPicker(); }
+
+const optLabel = d => (d.opts.find(o => o[0] === C(d.id)) || [0, C(d.id)])[1];
+function renderPicker() {
+  const open = DECISIONS.filter(d => !d.lock), locked = DECISIONS.filter(d => d.lock);
+  const radios = d => d.opts.map(([v, l, help], i) => {
+    const tag = d.lock ? (LOCKED[d.id] === v ? '<span class="lk">locked</span>' : '') : i === 0 ? '<span class="rec">recommended</span>' : '';
+    return `<button class="pk-opt ${C(d.id) === v ? 'on' : ''}" data-d="${d.id}" data-v="${v}"><span class="r"></span>${esc(l)}<span class="end">${tag}${help ? `<span class="hq" data-help="${esc(help)}">?</span>` : ''}</span></button>`;
+  }).join('');
+  let h = `<h1>${PRODUCT} ${VERSION} · round ${ROUND}</h1><p class="lede">${open.length} open. Hover an option to see it. ? explains it.</p>`;
+  if (Object.keys(BEFORE).length) h += `<div class="pk-ba"><button class="pk-btn ${S.before ? 'on' : ''}" data-a="before">Before</button><button class="pk-btn ${S.before ? '' : 'on'}" data-a="after">After</button><span>B</span></div>`;
+  h += `<div class="pk-notes"><ul>${HOWTO.map(n => `<li>${n}</li>`).join('')}</ul></div>`;
+  h += `<h2>Jump to</h2><div class="pk-scenes">${SCENES.map(([id, n]) => `<button class="pk-btn ${S.scene === id ? 'on' : ''}" data-scene="${id}">${n}</button>`).join('')}</div>`;
+  h += `<button class="pk-tog ${S.hover !== false ? 'on' : ''}" data-a="hover"><i></i>Preview on hover</button><button class="pk-tog ${S.guides ? 'on' : ''}" data-a="guides"><i></i>Alignment guides (G)</button><div class="pk-audit" id="audit"></div>`;
+  h += `<h2>Open</h2>${open.length ? '' : '<p class="lede">Nothing open.</p>'}`;
+  open.forEach(d => { h += `<div class="pk-dec"><b>${esc(d.name)}</b>${d.fb ? `<div class="pk-new">You said: <q>${esc(d.fb)}</q></div>` : ''}${d.note ? `<p>${esc(d.note)}</p>` : ''}${radios(d)}</div>`; });
+  h += `<h2>Locked (${locked.length})</h2>`;
+  if (!S.unlock) {
+    h += locked.map(d => `<div class="pk-lock"><b>${esc(d.name)}</b><span>${esc(optLabel(d))}${C(d.id) !== LOCKED[d.id] ? ' · changed' : ''}</span></div>`).join('');
+    if (locked.length) h += `<button class="pk-btn" style="margin-top:8px" data-a="unlock">Unlock to compare</button>`;
+  } else {
+    h += `<button class="pk-btn" data-a="unlock">Hide the locked options</button>`;
+    locked.forEach(d => { h += `${d.g ? `<h2>${esc(d.g)}</h2>` : ''}<div class="pk-dec"><b>${esc(d.name)}</b>${radios(d)}</div>`; });
+  }
+  h += `<div class="pk-foot"><button class="pk-btn" data-a="copy">Copy my picks</button><button class="pk-btn" data-a="reset">Back to locked picks</button><button class="pk-btn" data-a="demo">Reset demo data</button></div><textarea id="picks" readonly></textarea>`;
+  const top = picker.scrollTop; picker.innerHTML = h; picker.scrollTop = top;
+  document.getElementById('picks').value = picksText();
+  render();
+}
+function picksText() {
+  const line = d => `- ${d.name}: ${optLabel(d)}${d.lock ? (C(d.id) !== LOCKED[d.id] ? ' (changed from the locked pick)' : '') : C(d.id) === d.opts[0][0] ? '' : ' (not the recommendation)'}`;
+  return `# ${PRODUCT} ${VERSION} round ${ROUND} picks\n## Open\n${DECISIONS.filter(d => !d.lock).map(line).join('\n') || '- Nothing open'}\n## Locked\n${DECISIONS.filter(d => d.lock).map(line).join('\n')}\n## Notes\n- `;
+}
+// Hover preview: the option applies while hovered. Leaving restores the pick.
+function previewOn(id, v) {
+  if (S.hover === false) return;
+  const d = DECISIONS.find(x => x.id === id); if (!d) return;
+  if (PV && PV.id !== id) previewOff(true);
+  if (!PV) PV = { id, orig: S.c[id] };
+  if (PV.v === v) return;
+  PV.v = v; S.c[id] = v;
+  if (d.scene && S.scene !== d.scene) S.scene = d.scene;
+  render();
+}
+function previewOff(silent) { if (!PV) return; S.c[PV.id] = PV.orig; PV = null; save(); if (!silent) render(); }
+function markPreview() {
+  const d = PV && DECISIONS.find(x => x.id === PV.id);
+  if (d && d.hl) desk.querySelectorAll(d.hl).forEach(el => el.classList.add('pvhl'));
+}
+// Counter: text sizes, colours and weights in view.
+function audit() {
+  const box = document.getElementById('audit'); if (!box) return;
+  const sz = new Set(), co = new Set(), wt = new Set(), n = {};
+  for (const el of desk.querySelectorAll('*')) {
+    if (el.closest('#guides, [data-os]')) continue;
+    const own = [...el.childNodes].some(x => x.nodeType === 3 && x.textContent.trim()) || (el.matches('input, textarea') && el.value);
+    if (!own) continue;
+    const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue;
+    const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || +cs.opacity === 0) continue;
+    const f = parseFloat(cs.fontSize); sz.add(f); n[f] = (n[f] || 0) + 1; co.add(cs.color); wt.add(cs.fontWeight);
+  }
+  box.innerHTML = `In view: <b>${sz.size}</b> sizes · <b>${co.size}</b> text colours · <b>${wt.size}</b> weights<br>${[...sz].sort((a, b) => b - a).map(f => `${f} px ×${n[f]}`).join(' · ')}`;
+}
+// Alignment guides (G). Areas: [data-area]. Centred items: [data-centred] or .btn.
+// Green: a left edge that 3 or more items share. Blue: a shared right edge. Red: 1 to 5 px off a line.
+const CENTRED = '[data-centred], .btn';
+function drawGuides() {
+  desk.querySelector('#guides')?.remove(); window.__guides = null;
+  if (!S.guides) return;
+  const k = desk.getBoundingClientRect().width / DESK.w, dr = desk.getBoundingClientRect();
+  const X = x => (x - dr.left) / k, Y = y => (y - dr.top) / k;
+  let out = '', misses = [], cols = 0;
+  desk.querySelectorAll('[data-area]').forEach(area => {
+    const ar = area.getBoundingClientRect(), L = [], R = [];
+    const vis = r => r.width > 0 && r.height > 0 && r.bottom > ar.top && r.top < ar.bottom;
+    const push = (arr, x, r, what) => arr.push({ x: Math.round(X(x) * 2) / 2, t: Y(r.top), b: Y(r.bottom), l: X(r.left), w: r.width / k, what });
+    const tw = document.createTreeWalker(area, NodeFilter.SHOW_TEXT, { acceptNode: x => x.textContent.trim() ? 1 : 2 });
+    for (let t; (t = tw.nextNode());) {
+      const el = t.parentElement; if (!el || el.closest(CENTRED)) continue;
+      const cs = getComputedStyle(el); if (cs.textAlign === 'center' || cs.textAlign === 'right' || cs.marginLeft === 'auto') continue;
+      const rg = document.createRange(); rg.selectNodeContents(t); const r = rg.getClientRects()[0];
+      if (r && vis(r)) push(L, r.left, r, t.textContent.trim().slice(0, 24));
+    }
+    area.querySelectorAll('input, textarea').forEach(el => {
+      const r = el.getBoundingClientRect(); if (!vis(r) || el.closest(CENTRED)) return;
+      const cs = getComputedStyle(el); push(L, r.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth), r, (el.value || el.placeholder || '').slice(0, 24));
+    });
+    area.querySelectorAll('.ic, svg').forEach(el => {
+      const r = el.getBoundingClientRect(); if (!vis(r) || el.closest(CENTRED)) return;
+      if (!el.previousElementSibling) push(L, r.left, r, 'icon');
+      if (!el.nextElementSibling && !el.nextSibling?.textContent?.trim()) push(R, r.right, r, 'icon');
+    });
+    const group = arr => { const g = []; arr.sort((a, b) => a.x - b.x).forEach(e => { const last = g[g.length - 1]; if (last && e.x - last.x0 <= .75) last.items.push(e); else g.push({ x0: e.x, items: [e] }); }); g.forEach(c => { c.x = c.items.reduce((a, b) => a + b.x, 0) / c.items.length; }); return g; };
+    const lines = (arr, cls) => {
+      const g = group(arr), strong = g.filter(c => c.items.length >= 3);
+      strong.forEach(c => { cols++; out += `<div class="gv ${cls}" style="left:${c.x}px;top:${Y(ar.top)}px;height:${ar.height / k}px"><span>${Math.round(c.x - X(ar.left))}</span></div>`; });
+      g.filter(c => c.items.length < 3).forEach(c => {
+        const near = strong.find(s2 => Math.abs(s2.x - c.x) >= 1 && Math.abs(s2.x - c.x) <= 5); if (!near) return;
+        c.items.forEach(it => { const d = (it.x - near.x).toFixed(1); misses.push({ area: area.dataset.area, what: it.what, x: it.x, off: +d }); out += `<div class="bx" style="left:${it.l}px;top:${it.t}px;width:${Math.max(it.w, 2)}px;height:${it.b - it.t}px"><span>${d > 0 ? '+' : ''}${d}</span></div>`; });
+      });
+    };
+    lines(L, ''); lines(R, 'r');
+    out += `<div class="ol" style="left:${X(ar.left)}px;top:${Y(ar.top)}px;width:${ar.width / k}px;height:${ar.height / k}px"></div>`;
+  });
+  window.__guides = misses;
+  desk.insertAdjacentHTML('beforeend', `<div id="guides">${out}<div class="legend"><b>Alignment guides</b> · G to hide<br>green: shared left edge (3+) · blue: shared right edge<br>red: ${misses.length} item${misses.length === 1 ? '' : 's'} 1 to 5 px off a line · ${cols} lines</div></div>`);
+}
+
+picker.addEventListener('click', ev => {
+  const t = ev.target.closest('button'); if (!t) return;
+  const a = t.dataset.a;
+  if (t.dataset.scene) return preset(t.dataset.scene);
+  if (t.dataset.d) { PV = null; S.c[t.dataset.d] = t.dataset.v; S.before = false; }
+  else if (a === 'before' || a === 'after') S.before = a === 'before';
+  else if (a === 'hover') S.hover = S.hover === false;
+  else if (a === 'guides') S.guides = !S.guides;
+  else if (a === 'unlock') S.unlock = !S.unlock;
+  else if (a === 'copy') { navigator.clipboard?.writeText(picksText()); t.textContent = 'Copied'; return; }
+  else if (a === 'reset') { DECISIONS.forEach(d => { S.c[d.id] = d.lock ? LOCKED[d.id] : d.opts[0][0]; }); S.before = false; }
+  else if (a === 'demo') A = fresh();
+  else return;
+  save(); renderPicker();
+});
+picker.addEventListener('mouseover', ev => { const o = ev.target.closest('.pk-opt[data-d]'); if (o) previewOn(o.dataset.d, o.dataset.v); else if (PV) previewOff(); });
+picker.addEventListener('mouseleave', () => previewOff());
+desk.addEventListener('click', ev => { const t = ev.target.closest('button'); if (t && appClick(t)) { save(); renderPicker(); } });
+document.addEventListener('keydown', ev => {
+  if (ev.target.closest('input, textarea') || ev.metaKey || ev.ctrlKey) return;
+  if (ev.key === 'g' || ev.key === 'G') { S.guides = !S.guides; save(); renderPicker(); }
+  else if ((ev.key === 'b' || ev.key === 'B') && Object.keys(BEFORE).length) { S.before = !S.before; save(); renderPicker(); }
+});
+window.addEventListener('resize', () => { fit(); drawGuides(); });
+window.addEventListener('hashchange', () => { const id = location.hash.slice(1).split('&')[0]; if (id) preset(id); });
+fit();
+const scene0 = location.hash.slice(1).split('&')[0];
+if (scene0 && SCENES.some(s => s[0] === scene0)) preset(scene0); else renderPicker();
+document.fonts?.ready.then(() => { fit(); drawGuides(); });
+</script>
+</body>
+</html>

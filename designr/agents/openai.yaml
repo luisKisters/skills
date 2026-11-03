@@ -1,0 +1,4 @@
+interface:
+  display_name: "Designr"
+  short_description: "Design UI in rounds with an interactive HTML mockup, lock picks, ship a design system"
+  default_prompt: "Use $designr to design this screen: build a mockup round with options I can pick from."
