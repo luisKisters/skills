@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>designr mockup</title>
+<!-- designr v1: variations of how designr itself looks and works. -->
+<style>
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: #08080a; color: #d8d8dc; font: 13px/1.4 -apple-system, system-ui, sans-serif; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: inherit; padding: 0; }
+input { font: inherit; color: inherit; background: none; border: 0; outline: 0; }
+#root { display: flex; height: 100%; }
+#stage { flex: 1; position: relative; overflow: hidden; }
+.shot #picker { display: none; }
+
+/* ---------- picker (outside the app) ---------- */
+#picker { width: 380px; flex: none; border-left: 1px solid #222; background: #111113; overflow-y: auto; padding: 18px 18px 40px; }
+#picker h1 { font-size: 15px; font-weight: 650; color: #f2f2f4; margin: 0; }
+#picker h2 { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: #6c6c74; font-weight: 600; margin: 22px 0 8px; }
+#picker .lede { color: #8a8a92; font-size: 12px; margin: 4px 0 14px; }
+.pk-btn { padding: 5px 9px; border-radius: 7px; background: #1b1b1f; color: #b4b4bb; font-size: 12px; border: 1px solid #26262b; }
+.pk-btn:hover { background: #222227; color: #eee; }
+.pk-btn.on { background: #ececf0; color: #111; border-color: #ececf0; }
+.pk-scenes { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.pk-notes { padding: 10px 12px; border-radius: 9px; background: #17171a; border: 1px solid #222226; color: #a6a6ae; font-size: 12px; }
+.pk-notes ul { margin: 0; padding-left: 15px; }
+.pk-ba { display: flex; gap: 4px; align-items: center; margin-bottom: 10px; }
+.pk-ba span { color: #6c6c74; font-size: 11px; margin-left: 4px; }
+.pk-tog { display: flex; gap: 8px; align-items: center; color: #a6a6ae; font-size: 12px; margin-top: 6px; }
+.pk-tog i { width: 24px; height: 14px; border-radius: 7px; background: #2a2a30; position: relative; flex: none; }
+.pk-tog i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: #8a8a92; transition: transform .15s; }
+.pk-tog.on i { background: #ececf0; } .pk-tog.on i::after { transform: translateX(10px); background: #111; }
+.pk-audit { margin-top: 8px; color: #8a8a92; font-size: 11.5px; }
+.pk-audit b { color: #eee; }
+.pk-dec { margin-bottom: 14px; }
+.pk-dec > b { color: #f2f2f4; font-size: 12.5px; }
+.pk-dec p { color: #8a8a92; font-size: 12px; margin: 3px 0 6px; }
+.pk-new { color: #a6a6ae; font-size: 12px; margin: 3px 0 6px; }
+.pk-new q { color: #e6e6ea; }
+.pk-opt { display: flex; align-items: center; gap: 8px; width: 100%; padding: 5px 8px; border-radius: 7px; color: #b4b4bb; font-size: 12px; }
+.pk-opt:hover { background: #1b1b1f; color: #eee; }
+.pk-opt.on { color: #f4f4f6; background: #1d1d22; }
+.pk-opt .r { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #4a4a52; flex: none; }
+.pk-opt.on .r { border-color: #f4f4f6; background: radial-gradient(#f4f4f6 0 2.5px, transparent 3px); }
+.pk-opt .end { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.pk-opt .rec, .pk-opt .lk { font-size: 10.5px; color: #6c6c74; }
+.pk-opt .hq { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #3a3a42; color: #8a8a92; font-size: 10px; display: inline-grid; place-items: center; position: relative; }
+.pk-opt .hq:hover::after { content: attr(data-help); position: absolute; right: -4px; top: 22px; width: 270px; padding: 8px 10px; border-radius: 8px; background: #26262c; border: 1px solid #3a3a42; color: #e6e6ea; font-size: 11.5px; line-height: 1.45; white-space: normal; z-index: 10; }
+.pk-lock { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; padding: 3px 0; color: #8a8a92; }
+.pk-lock b { font-weight: 500; color: #c4c4cb; }
+.pk-foot { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 22px; }
+#picks { margin-top: 10px; width: 100%; height: 150px; background: #141417; color: #bdbdc4; border: 1px solid #25252a; border-radius: 8px; padding: 8px; font: 11px/1.45 ui-monospace, Menlo, monospace; resize: vertical; }
+
+/* ---------- preview outline and alignment guides ---------- */
+.pvhl { outline: 1.5px solid rgba(90, 160, 255, .9) !important; outline-offset: 1px; }
+#guides { position: absolute; inset: 0; pointer-events: none; z-index: 150; }
+#guides .gv { position: absolute; width: 0; border-left: 1px solid rgba(64, 214, 120, .55); }
+#guides .gv.r { border-left-color: rgba(90, 160, 255, .55); }
+#guides .gv span { position: absolute; top: 2px; left: 2px; font: 9px ui-monospace, Menlo, monospace; color: rgba(64, 214, 120, .95); background: rgba(0,0,0,.6); padding: 0 2px; }
+#guides .bx { position: absolute; outline: 1px solid rgba(255, 70, 90, .95); background: rgba(255, 70, 90, .12); }
+#guides .bx span { position: absolute; top: -12px; left: 0; font: 9px ui-monospace, Menlo, monospace; color: #fff; background: rgba(220, 40, 60, .9); padding: 0 3px; white-space: nowrap; }
+#guides .ol { position: absolute; outline: 1px dashed rgba(255, 255, 255, .14); }
+#guides .legend { position: absolute; left: 12px; bottom: 12px; padding: 8px 10px; border-radius: 8px; background: rgba(10,10,12,.88); border: 1px solid rgba(255,255,255,.12); font: 11px/1.5 -apple-system, system-ui; color: #ddd; }
+
+/* ================= the app: a working designr on a small Tasks app ================= */
+.desk { position: absolute; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; background: #000; font: 12.5px/1.4 -apple-system, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.dz { position: absolute; inset: 0; display: flex; background: #000; }
+.dz.L-bottom { flex-direction: column; }
+.dz-appwrap { position: relative; flex: 1; overflow: hidden; min-width: 0; min-height: 0; }
+.dz-app, .dz-ghost { position: absolute; inset: 0; }
+.dz-ghost { pointer-events: none; z-index: 5; }
+.dz.cm .dz-app { cursor: crosshair; }
+
+/* the product: Tasks (light, so it reads apart from the designr chrome) */
+.ap { --a: #171717; --aon: #fff; position: absolute; inset: 0; display: flex; background: #fafafa; color: #171717; font: 13px/1.4 -apple-system, system-ui, sans-serif; }
+.ap.acc-blue { --a: #0a6cff; } .ap.acc-green { --a: #15803d; }
+.ap-side { width: 200px; flex: none; background: #f3f3f3; border-right: 1px solid #e6e6e6; padding: 16px 10px; }
+.ap-brand { font-weight: 650; padding: 0 8px 14px; }
+.ap-nav { display: flex; align-items: center; gap: 8px; width: 100%; height: 28px; padding: 0 8px; border-radius: 6px; color: #555; }
+.ap-nav i { width: 12px; height: 12px; border-radius: 3px; background: currentColor; opacity: .45; }
+.ap-nav.on { background: var(--a); color: var(--aon); }
+.ap-main { flex: 1; min-width: 0; padding: 28px 32px; overflow: hidden; }
+.ap-hdr { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.ap h1 { margin: 0; font-size: 26px; font-weight: 650; letter-spacing: -.02em; }
+.ap .sub { color: #777; font-size: 12.5px; margin-top: 2px; }
+.t-compact .ap-hdr { align-items: center; }
+.t-compact h1 { font-size: 15px; letter-spacing: 0; display: inline; }
+.t-compact .sub { display: inline; margin-left: 8px; }
+.ap-tabs { display: flex; gap: 4px; }
+.ap-tab { height: 30px; padding: 0 12px; border-radius: 8px; color: #666; }
+.ap-tab.on { background: #e9e9e9; color: #111; }
+.ap-btn { height: 32px; padding: 0 14px; border-radius: 8px; background: var(--a); color: var(--aon); font-weight: 600; flex: none; }
+.d-28 { --rh: 28px; } .d-32 { --rh: 32px; } .d-40 { --rh: 40px; }
+.ap-row { display: flex; align-items: center; gap: 10px; height: var(--rh); padding: 0 10px; margin: 0 -10px; border-radius: 6px; }
+.ap-row:hover { background: #efefef; }
+.ap-row .ck { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #b5b5b5; flex: none; }
+.ap-row .dt { margin-left: auto; color: #888; font-size: 12px; }
+.rows-lines .ap-row { border-radius: 0; border-bottom: 1px solid #e8e8e8; }
+.rows-boxed .ap-row { margin: 0 0 6px; background: #fff; border: 1px solid #e4e4e4; border-radius: 8px; }
+.ap-set { display: flex; align-items: center; justify-content: space-between; height: 44px; border-bottom: 1px solid #ececec; max-width: 520px; }
+.ap-set .hint { color: #888; font-size: 12px; }
+.sw { width: 34px; height: 20px; border-radius: 10px; background: #d4d4d4; position: relative; flex: none; }
+.sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.sw.on { background: var(--a); } .sw.on::after { left: 16px; }
+.ck2 { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid #b5b5b5; display: grid; place-items: center; color: var(--aon); font-size: 11px; }
+.ck2.on { background: var(--a); border-color: var(--a); }
+.seg2 { display: flex; padding: 2px; border-radius: 8px; background: #ececec; }
+.seg2 span { height: 24px; padding: 0 10px; border-radius: 6px; display: grid; place-items: center; color: #777; font-size: 12px; }
+.seg2 span.on { background: #fff; color: #111; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+
+/* designr chrome (dark) */
+.dz-panel { background: #0a0a0a; color: #ededed; font: 12.5px/1.4 -apple-system, system-ui, sans-serif; }
+.L-side .dz-panel { width: 340px; flex: none; border-left: 1px solid #222; overflow-y: auto; padding: 16px; }
+.L-float .dz-panel { position: absolute; z-index: 20; width: 320px; max-height: 820px; overflow-y: auto; padding: 14px; border: 1px solid #2a2a2a; border-radius: 12px; box-shadow: 0 24px 60px rgba(0,0,0,.4); }
+.L-float .dz-panel.min { width: auto; padding: 8px 12px; overflow: hidden; }
+.L-float .dz-panel.min .dz-body, .L-float .dz-panel.min .dz-foot, .L-float .dz-panel.min .dz-sub { display: none; }
+.L-bottom .dz-panel { height: 262px; flex: none; border-top: 1px solid #222; padding: 12px 16px; display: flex; flex-direction: column; }
+.L-bottom .dz-body { display: flex; gap: 10px; overflow-x: auto; flex: 1; padding-bottom: 4px; }
+.L-bottom .dz-dec { width: 290px; flex: none; background: #111; border: 1px solid #222; border-radius: 10px; padding: 10px; margin: 0; }
+.L-bottom .dz-foot { display: none; }
+.dz-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.L-float .dz-hd { cursor: grab; }
+.dz-hd b { font-size: 13px; font-weight: 600; }
+.dz-sub { color: #8f8f8f; font-size: 12px; }
+.dz-hd .sp { flex: 1; }
+.dz-ib { height: 26px; padding: 0 8px; border-radius: 6px; color: #a1a1a1; border: 1px solid #262626; font-size: 12px; }
+.dz-ib:hover, .dz-ib.on { color: #fff; background: #1a1a1a; }
+.dz-dec { margin-bottom: 16px; }
+.dz-dec > .nm { display: flex; align-items: baseline; gap: 6px; font-weight: 600; margin-bottom: 2px; }
+.dz-dec q { display: block; color: #a1a1a1; font-size: 12px; margin-bottom: 6px; }
+.dz-tag { font-size: 11px; color: #8f8f8f; font-weight: 400; }
+.dz-tag button { color: #52a8ff; }
+.dz-hint { color: #8f8f8f; font-size: 11.5px; margin-top: 4px; }
+.dz-opt { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 28px; padding: 4px 8px; border-radius: 6px; color: #a1a1a1; }
+.dz-opt:hover { background: #161616; color: #ededed; }
+.dz-opt .r { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px #454545; flex: none; }
+.dz-opt.on { color: #ededed; background: #1a1a1a; }
+.dz-opt.on .r { box-shadow: inset 0 0 0 1.5px #ededed; background: radial-gradient(#ededed 0 2.5px, transparent 3px); }
+.dz-opt.pv { box-shadow: inset 0 0 0 1px #52a8ff; color: #fff; }
+.dz-opt .k { margin-left: auto; color: #6b6b6b; font-size: 11px; }
+.dz-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.dz-thumbs .dz-opt { flex-direction: column; align-items: stretch; padding: 4px; gap: 4px; font-size: 11.5px; }
+.dz-thumbs .dz-opt .r { display: none; }
+.th { position: relative; height: 62px; border-radius: 5px; overflow: hidden; background: #fafafa; pointer-events: none; }
+.th-in { position: absolute; left: 0; top: 0; width: 1100px; height: 720px; transform-origin: 0 0; }
+.dz-seg { display: flex; padding: 2px; border-radius: 8px; border: 1px solid #262626; }
+.dz-seg .dz-opt { justify-content: center; text-align: center; min-height: 26px; padding: 3px 6px; font-size: 12px; }
+.dz-seg .dz-opt .r { display: none; }
+.dz-seg .dz-opt .k { margin-left: 4px; }
+.dz-note { width: 100%; margin-top: 6px; height: 28px; padding: 0 8px; border-radius: 6px; background: #141414; border: 1px solid #262626; color: #ededed; font: inherit; }
+.dz-steps { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; color: #8f8f8f; font-size: 12px; }
+.dz-steps i { width: 6px; height: 6px; border-radius: 50%; background: #333; }
+.dz-steps i.on { background: #ededed; }
+.dz-steps .sp { flex: 1; }
+.dz-foot { border-top: 1px solid #1f1f1f; padding-top: 10px; }
+.dz-foot textarea { width: 100%; height: 96px; margin-top: 8px; background: #111; color: #bdbdbd; border: 1px solid #222; border-radius: 8px; padding: 8px; font: 11px/1.45 ui-monospace, Menlo, monospace; resize: none; }
+.dz-pin { position: absolute; z-index: 15; width: 22px; height: 22px; border-radius: 50%; background: #0a0a0a; color: #fff; font-size: 11px; font-weight: 600; display: grid; place-items: center; box-shadow: 0 0 0 2px #52a8ff; }
+.dz-pin.on { background: #52a8ff; }
+.dz-more { position: absolute; left: 16px; bottom: 16px; z-index: 15; height: 28px; padding: 0 10px; border-radius: 8px; background: #0a0a0a; color: #ededed; }
+.dz-pop { position: absolute; z-index: 20; width: 300px; padding: 12px; border-radius: 12px; border: 1px solid #2a2a2a; box-shadow: 0 24px 60px rgba(0,0,0,.4); }
+.dz-pop .dz-dec { margin: 0; }
+.dz-pip { position: absolute; right: 16px; bottom: 16px; z-index: 12; width: 366px; height: 260px; border-radius: 10px; overflow: hidden; background: #fafafa; box-shadow: 0 0 0 1px rgba(0,0,0,.12), 0 18px 40px rgba(0,0,0,.25); }
+.dz-pip .lbl { position: absolute; left: 8px; top: 8px; z-index: 2; padding: 2px 8px; border-radius: 6px; background: #0a0a0a; color: #fff; font-size: 11.5px; }
+.dz-toast { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 12; padding: 6px 12px; border-radius: 8px; background: #0a0a0a; color: #ededed; font-size: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.25); pointer-events: none; }
+.dz-spot { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+.dz .pvhl { outline: 2px solid #52a8ff !important; outline-offset: 2px; }
+.dz .pvpulse { animation: pvpulse 900ms ease-out forwards; }
+@keyframes pvpulse { 0% { box-shadow: 0 0 0 0 rgba(82,168,255,.9), 0 0 0 2px #52a8ff; } 60% { box-shadow: 0 0 0 8px rgba(82,168,255,0), 0 0 0 2px #52a8ff; } 100% { box-shadow: 0 0 0 8px rgba(82,168,255,0), 0 0 0 2px transparent; } }
+.dz-cms { position: absolute; inset: 0; z-index: 14; pointer-events: none; }
+.dz-cm { position: absolute; pointer-events: auto; display: flex; gap: 6px; align-items: flex-start; }
+.dz-cm i { width: 22px; height: 22px; border-radius: 11px 11px 11px 2px; background: #f5a524; color: #000; font-style: normal; font-size: 11px; font-weight: 700; display: grid; place-items: center; flex: none; }
+.dz-cm input, .dz-cm span { background: #0a0a0a; color: #ededed; border: 1px solid #333; border-radius: 6px; padding: 3px 8px; font: 12px -apple-system, system-ui; max-width: 220px; }
+
+</style>
+</head>
+<body>
+<div id="root"><div id="stage"><div class="desk" id="desk"></div></div><aside id="picker"></aside></div>
+<script>
+// ================= edit for each round =================
+const PRODUCT = 'designr', VERSION = 'v1', ROUND = 1;
+const DESK = { w: 1440, h: 900 };
+const SCENES = [['try', 'Try it on Tasks'], ['settings', 'Start on Settings']];
+const HOWTO = [
+  'The left side is a working designr on a small Tasks app. Hover and click its options to feel each variant.',
+  'Your picks on the right change how that designr looks and works.',
+  'Keys on the left: Space (hold mode), C (comment mode), 1 to 3 (segmented options), Esc.',
+  'G shows the alignment guides.',
+];
+const LOCKED = {};
+const BEFORE = {};
+const DECISIONS = [
+  { g: 'Preview on hover', id: 'hovermode', name: 'How hovering an option shows it', fb: 'das es direkt die changed zeigt on hover aber da is teils das menu dann rumgejumped oder is war zu jaggy', note: 'Move the mouse down the options on the left, slowly and fast.', scene: 'try', hl: '.dz-opt', opts: [
+    ['intent', 'Short pause, then show; stays while you move inside a decision', 'The option shows after 110 ms on it. Moving through the gaps between options keeps the preview. It goes back only when you leave the decision. No flicker on a fast pass.'],
+    ['instant', 'Instant, back in every gap (now)', 'How the Calendr and Hotspotr mockups work: every option shows at once, and every gap between two options shows the pick again. A fast pass flickers.'],
+    ['hold', 'Hover marks it, hold Space to see it', 'Nothing changes on hover. Hold Space to see the hovered option, release to go back. Calm, but you must know the key.'],
+    ['click', 'Click to try, click again to pick', 'No hover preview. The first click shows the option, the second click picks it. Esc goes back.'],
+  ] },
+  { id: 'scenemode', name: 'When the option is on another screen', note: 'Hover "Settings switches" on the left while Tasks shows the list.', scene: 'try', hl: '.dz-pip, .dz-toast, .dz-tag', opts: [
+    ['pip', 'Stay, show that screen small in a corner', 'The screen you look at stays. A small live picture of the other screen shows the option.'],
+    ['switch', 'Jump to that screen while hovering (now)', 'The whole app jumps to the other screen and back. This is the main cause of the jumping in the Hotspotr mockups.'],
+    ['stay', 'Stay, say where it is, with an Open link', 'Nothing jumps. A short note says which screen the option changes, and the decision has an Open link.'],
+  ] },
+  { id: 'motion', name: 'How the change appears', note: 'Hover "Title" on the left: the list moves up and down.', scene: 'try', hl: '.dz-app', opts: [
+    ['morph', 'Things slide to their new place (180 ms)', 'Each part moves and resizes from where it was to where it goes. You see what changed by the movement.'],
+    ['fade', 'Short crossfade (140 ms)', 'The old look fades out over the new one.'],
+    ['none', 'Instant swap (now)', 'No animation.'],
+  ] },
+  { id: 'mark', name: 'How it marks what changes', scene: 'try', hl: '.dz-app', opts: [
+    ['pulse', 'A short glow, then nothing', 'The changed parts glow once and the glow fades, so the outline does not cover the design.'],
+    ['outline', 'Blue outline while hovering (now)', 'The changed parts keep a blue outline while you hover.'],
+    ['spot', 'Dim everything else', 'All but the changed parts go dark while you hover.'],
+    ['none', 'No mark', 'Only the change itself.'],
+  ] },
+  { g: 'Layout', id: 'layout', name: 'Where the picker sits', scene: 'try', hl: '.dz-panel, .dz-pin', opts: [
+    ['side', 'Sidebar on the right (now)', 'A fixed column beside the app. The app is narrower.'],
+    ['float', 'Floating panel you can move and fold', 'The app gets the full width. Drag the panel by its title. "Fold" makes it a small pill.'],
+    ['bottom', 'Drawer at the bottom, one card per decision', 'Decisions sit side by side under the app. Good for short decisions.'],
+    ['pins', 'Pins on the app, options open at the pin', 'A numbered pin sits on each part with a decision. A click opens the options next to it. The options stay where they opened, also when the app changes under them.'],
+  ] },
+  { id: 'optstyle', name: 'How options look', scene: 'try', hl: '.dz-opts', opts: [
+    ['list', 'Radio list (now)', 'One line per option.'],
+    ['thumbs', 'Small pictures of each option', 'Each option shows a small live picture of the app with that option. You can compare without hovering.'],
+    ['seg', 'Segmented row, keys 1 to 3', 'All options in one row. Keys 1 to 3 pick in the decision under the mouse.'],
+  ] },
+  { id: 'flow', name: 'How you go through the decisions', scene: 'try', hl: '.dz-body', opts: [
+    ['all', 'All open decisions in one list (now)', 'You see everything at once and scroll.'],
+    ['one', 'One at a time: 2 of 5, Back and Next', 'Only one decision shows. Less to read, and the app does not move under a long list. Pins ignore this.'],
+  ] },
+  { g: 'Feedback', id: 'feedback', name: 'How you give feedback', scene: 'try', hl: '.dz-foot, .dz-note, [data-i="cm"]', opts: [
+    ['note', 'A note field under each decision', 'Type a note per decision. "Copy my picks" puts it under the pick.'],
+    ['text', 'Copy my picks, write notes in the chat (now)', 'One text to paste, notes written after it.'],
+    ['pin', 'Click the app to leave a comment there', 'Press C or "Comment", then click a part of the app and type. The comment goes into the picks text with the part it is on.'],
+  ] },
+];
+
+// ================= demo data: the Tasks app and its own decisions =================
+const TASK_DECS = [
+  { id: 'rows', name: 'List rows', fb: 'The list looks cluttered.', scene: 'home', hl: '.ap-row', opts: [['plain', 'Plain rows'], ['lines', 'Hairlines'], ['boxed', 'A box per row']] },
+  { id: 'title', name: 'Title', scene: 'home', hl: '.ap-hdr', opts: [['big', 'Big title'], ['compact', 'Compact title'], ['tabs', 'Tabs, no title']] },
+  { id: 'accent', name: 'Accent', scene: 'home', hl: '.ap-btn, .ap-nav.on', opts: [['ink', 'Ink'], ['blue', 'Blue'], ['green', 'Green']] },
+  { id: 'density', name: 'Row height', scene: 'home', hl: '.ap-row', opts: [['32', '32 px'], ['28', '28 px'], ['40', '40 px']] },
+  { id: 'toggle', name: 'Settings switches', fb: 'The switches look heavy.', scene: 'settings', hl: '.sw, .ck2, .seg2', opts: [['switch', 'Switch'], ['check', 'Checkbox'], ['seg', 'On · Off']] },
+];
+const TASKS = [['Send the brief to the studio', 'Today'], ['Review the logo options', 'Today'], ['Book the train to Hamburg', 'Tomorrow'], ['Pay the invoice from March', 'Fri'], ['Call the landlord about the heating', 'Next week'], ['Back up the photo library', 'Next week']];
+const SETS = [['Sync on mobile data', 'Uses data when you are not on Wi-Fi', true], ['Show completed tasks', 'They stay in the list, struck through', false], ['Sounds', 'A short sound when you complete a task', true]];
+function fresh() {
+  return { c: Object.fromEntries(TASK_DECS.map(d => [d.id, d.opts[0][0]])), scene: 'home', pv: null, hov: null, space: false,
+    step: 0, notes: {}, cms: [], cm: false, fx: 1080, fy: 60, min: false, pin: null, popAt: null, hovDec: null };
+}
+const SCENE_NAME = { home: 'Inbox', settings: 'Settings' };
+
+// ================= the app =================
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const CI = id => (A.pv && A.pv.id === id ? A.pv.v : A.c[id]);
+const decOf = id => TASK_DECS.find(d => d.id === id);
+const pvDec = () => A.pv && decOf(A.pv.id);
+const shownScene = () => (A.pv && C('scenemode') === 'switch' ? pvDec().scene : A.scene);
+const deskK = () => desk.getBoundingClientRect().width / DESK.w;
+
+function taskApp(scene, c) {
+  const nav = [['home', 'Inbox'], ['today', 'Today'], ['projects', 'Projects'], ['settings', 'Settings']].map(([id, n]) => `<button class="ap-nav ${scene === id ? 'on' : ''}" data-iscene="${id}" data-k="nav-${id}"><i></i>${n}</button>`).join('');
+  let main;
+  if (scene === 'settings') {
+    const ctl = on => c.toggle === 'check' ? `<span class="ck2 ${on ? 'on' : ''}">${on ? '✓' : ''}</span>` : c.toggle === 'seg' ? `<span class="seg2"><span class="${on ? 'on' : ''}">On</span><span class="${on ? '' : 'on'}">Off</span></span>` : `<span class="sw ${on ? 'on' : ''}"></span>`;
+    main = `<div class="ap-hdr" data-k="hdr"><div><h1 data-k="h1">Settings</h1></div></div>${SETS.map(([t, h, on], i) => `<div class="ap-set" data-k="set-${i}" data-label="${esc(t)}"><div><div>${t}</div><div class="hint">${h}</div></div>${ctl(on)}</div>`).join('')}`;
+  } else {
+    const head = c.title === 'tabs'
+      ? `<div class="ap-tabs" data-k="h1"><span class="ap-tab on">Inbox</span><span class="ap-tab">Today</span><span class="ap-tab">Done</span></div>`
+      : `<div data-k="h1"><h1>Inbox</h1><div class="sub">6 tasks</div></div>`;
+    main = `<div class="ap-hdr" data-k="hdr" data-label="Header">${head}<button class="ap-btn" data-k="btn">New task</button></div>${TASKS.map(([t, d], i) => `<div class="ap-row" data-k="row-${i}" data-label="${esc(t)}"><span class="ck"></span>${t}<span class="dt">${d}</span></div>`).join('')}`;
+  }
+  return `<div class="ap acc-${c.accent} rows-${c.rows} t-${c.title} d-${c.density}"><div class="ap-side" data-k="side"><div class="ap-brand">Tasks</div>${nav}</div><div class="ap-main">${main}</div></div>`;
+}
+
+// A thumbnail sits inside an option button. Buttons cannot nest, so the copy uses spans.
+const noButtons = h => h.replace(/<button/g, '<span').replace(/<\/button>/g, '</span>');
+function optsHTML(d) {
+  const st = C('optstyle'), cur = A.c[d.id];
+  const cls = (v) => `dz-opt ${cur === v ? 'on' : ''} ${A.pv && A.pv.id === d.id && A.pv.v === v ? 'pv' : ''}`;
+  if (st === 'thumbs') {
+    const s = 96 / 1100;
+    return `<div class="dz-opts dz-thumbs">${d.opts.map(([v, l]) => `<button class="${cls(v)}" data-dec="${d.id}" data-v="${v}"><div class="th"><div class="th-in" style="transform:scale(${s})">${noButtons(taskApp(d.scene, { ...A.c, [d.id]: v }))}</div></div><span class="r"></span>${l}</button>`).join('')}</div>`;
+  }
+  if (st === 'seg') return `<div class="dz-opts dz-seg">${d.opts.map(([v, l], i) => `<button class="${cls(v)}" data-dec="${d.id}" data-v="${v}"><span class="r"></span>${l}<span class="k">${i + 1}</span></button>`).join('')}</div>`;
+  return `<div class="dz-opts">${d.opts.map(([v, l], i) => `<button class="${cls(v)}" data-dec="${d.id}" data-v="${v}"><span class="r"></span>${l}${i === 0 ? '<span class="k">recommended</span>' : ''}</button>`).join('')}</div>`;
+}
+function decHTML(d) {
+  const other = d.scene !== A.scene;
+  const tag = other ? `<span class="dz-tag">on ${SCENE_NAME[d.scene]}${C('scenemode') === 'stay' ? ` · <button data-i="go" data-s="${d.scene}">Open</button>` : ''}</span>` : '';
+  const hint = { hold: 'Hover an option and hold Space to see it.', click: 'Click to try, click again to pick.' }[C('hovermode')];
+  return `<div class="dz-dec" data-dec="${d.id}"><div class="nm">${d.name}${tag}</div>${d.fb ? `<q>${esc(d.fb)}</q>` : ''}${optsHTML(d)}${hint ? `<div class="dz-hint">${hint}</div>` : ''}${C('feedback') === 'note' ? `<input class="dz-note" data-note="${d.id}" placeholder="Add a note" value="${esc(A.notes[d.id] || '')}">` : ''}</div>`;
+}
+function bodyHTML() {
+  if (C('flow') === 'one') {
+    const i = Math.min(A.step, TASK_DECS.length - 1);
+    const dots = TASK_DECS.map((_, j) => `<i class="${j === i ? 'on' : ''}"></i>`).join('');
+    return `<div class="dz-body"><div class="dz-steps">${dots}<span>${i + 1} of ${TASK_DECS.length}</span><span class="sp"></span><button class="dz-ib" data-i="back" ${i ? '' : 'disabled'}>Back</button><button class="dz-ib" data-i="next">${i === TASK_DECS.length - 1 ? 'Done' : 'Next'}</button></div>${decHTML(TASK_DECS[i])}</div>`;
+  }
+  return `<div class="dz-body">${TASK_DECS.map(decHTML).join('')}</div>`;
+}
+function headHTML() {
+  const fold = C('layout') === 'float' ? `<button class="dz-ib" data-i="min">${A.min ? 'Open' : 'Fold'}</button>` : '';
+  const cm = C('feedback') === 'pin' ? `<button class="dz-ib ${A.cm ? 'on' : ''}" data-i="cm">Comment</button>` : '';
+  return `<div class="dz-hd" data-i="drag"><div><b>Tasks · round 2</b><div class="dz-sub">${TASK_DECS.length} open</div></div><span class="sp"></span>${cm}${fold}</div>`;
+}
+function footHTML() { return `<div class="dz-foot"><button class="dz-ib" data-i="copy">Copy my picks</button><textarea readonly>${esc(taskPicks())}</textarea></div>`; }
+function taskPicks() {
+  const lines = TASK_DECS.map(d => `- ${d.name}: ${d.opts.find(o => o[0] === A.c[d.id])[1]}${A.notes[d.id] ? `\n  Note: ${A.notes[d.id]}` : ''}`);
+  const cms = A.cms.filter(x => x.text).map((x, i) => `- ${i + 1} on "${x.label}": ${x.text}`);
+  return `# Tasks round 2 picks\n${lines.join('\n')}${cms.length ? `\n## Comments\n${cms.join('\n')}` : ''}`;
+}
+function deskClass() { return ''; }
+function app() {
+  const L = C('layout');
+  let panel = '';
+  if (L === 'side' || L === 'bottom') panel = `<div class="dz-panel" data-area="picker">${headHTML()}${bodyHTML()}${footHTML()}</div>`;
+  if (L === 'float') panel = `<div class="dz-panel ${A.min ? 'min' : ''}" data-area="picker" style="left:${A.fx}px;top:${A.fy}px">${headHTML()}${bodyHTML()}${footHTML()}</div>`;
+  const wrap = `<div class="dz-appwrap"><div class="dz-app" data-area="app"></div><div class="dz-cms"></div><div class="dz-layer"></div>${L === 'pins' ? '<div class="dz-pins"></div><div class="dz-popbox"></div>' : ''}</div>`;
+  return `<div class="dz L-${L} ${A.cm ? 'cm' : ''}">${wrap}${panel}</div>`;
+}
+
+// Render only the app area. The picker DOM stays, so nothing moves under the mouse.
+function renderApp(animate = true) {
+  const host = desk.querySelector('.dz-app'); if (!host) return;
+  const wrap = host.parentElement, k = deskK(), m = animate ? C('motion') : 'none';
+  const before = {};
+  if (m === 'morph') { const wr = wrap.getBoundingClientRect(); host.querySelectorAll('[data-k]').forEach(el => { const r = el.getBoundingClientRect(); before[el.dataset.k] = { x: (r.left - wr.left) / k, y: (r.top - wr.top) / k, w: r.width / k, h: r.height / k }; }); }
+  wrap.querySelectorAll('.dz-ghost').forEach(g => g.remove());
+  if (m === 'fade' && host.firstChild) {
+    const g = host.cloneNode(true); g.className = 'dz-ghost'; g.removeAttribute('data-area'); wrap.appendChild(g);
+    g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: 'ease-out' }).onfinish = () => g.remove();
+  }
+  host.innerHTML = taskApp(shownScene(), Object.fromEntries(TASK_DECS.map(d => [d.id, CI(d.id)])));
+  if (m === 'morph') {
+    const wr = wrap.getBoundingClientRect();
+    host.querySelectorAll('[data-k]').forEach(el => {
+      const b = before[el.dataset.k], r = el.getBoundingClientRect();
+      const n = { x: (r.left - wr.left) / k, y: (r.top - wr.top) / k, w: r.width / k, h: r.height / k };
+      if (!b) { el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160 }); return; }
+      if (Math.abs(b.x - n.x) < .5 && Math.abs(b.y - n.y) < .5 && Math.abs(b.w - n.w) < .5 && Math.abs(b.h - n.h) < .5) return;
+      el.animate([{ transformOrigin: '0 0', transform: `translate(${b.x - n.x}px, ${b.y - n.y}px) scale(${b.w / n.w}, ${b.h / n.h})` }, { transformOrigin: '0 0', transform: 'none' }], { duration: 180, easing: 'cubic-bezier(.22,.61,.36,1)' });
+    });
+  }
+  layer(); pins(); comments();
+}
+// Marks, the corner picture and the note for an option on another screen.
+function layer() {
+  const wrap = desk.querySelector('.dz-appwrap'), host = desk.querySelector('.dz-app'), L = wrap.querySelector('.dz-layer');
+  L.innerHTML = '';
+  const d = pvDec(); if (!d) return;
+  const other = d.scene !== A.scene, sm = C('scenemode');
+  if (other && sm === 'pip') {
+    const s = 366 / 1100;
+    L.innerHTML = `<div class="dz-pip"><span class="lbl">${SCENE_NAME[d.scene]} · ${d.opts.find(o => o[0] === A.pv.v)[1]}</span><div class="th-in" style="transform:scale(${s})">${taskApp(d.scene, Object.fromEntries(TASK_DECS.map(x => [x.id, CI(x.id)])))}</div></div>`;
+    markIn(L.querySelector('.dz-pip'), d, L, wrap, true);
+    return;
+  }
+  if (other && sm === 'stay') { L.innerHTML = `<div class="dz-toast">This option changes ${SCENE_NAME[d.scene]}. Open it to see it.</div>`; return; }
+  markIn(host, d, L, wrap, false);
+}
+function markIn(root, d, L, wrap, small) {
+  const mk = C('mark'), els = [...root.querySelectorAll(d.hl)];
+  if (mk === 'outline') els.forEach(el => el.classList.add('pvhl'));
+  if (mk === 'pulse') els.forEach(el => el.classList.add('pvpulse'));
+  if (mk === 'spot' && !small) {
+    const k = deskK(), wr = wrap.getBoundingClientRect(), W = wr.width / k, H = wr.height / k;
+    const holes = els.map(el => { const r = el.getBoundingClientRect(); const x = (r.left - wr.left) / k - 4, y = (r.top - wr.top) / k - 4, w = r.width / k + 8, h = r.height / k + 8; return `M${x},${y}h${w}v${h}h${-w}z`; }).join('');
+    L.insertAdjacentHTML('beforeend', `<svg class="dz-spot" width="${W}" height="${H}"><path fill="rgba(0,0,0,.55)" fill-rule="evenodd" d="M0,0H${W}V${H}H0z${holes}"/></svg>`);
+  }
+}
+// Pins: one per decision on this screen. The open options stay where they opened.
+function pins() {
+  const P = desk.querySelector('.dz-pins'); if (!P) return;
+  const wrap = P.parentElement, host = wrap.querySelector('.dz-app'), k = deskK(), wr = wrap.getBoundingClientRect();
+  let h = '', n = 0;
+  const here = TASK_DECS.filter(d => d.scene === A.scene), away = TASK_DECS.filter(d => d.scene !== A.scene);
+  here.forEach(d => {
+    n++; const el = host.querySelector(d.hl); if (!el) return;
+    const r = el.getBoundingClientRect(), x = Math.max(4, (r.left - wr.left) / k - 11 + (d.id === 'density' ? 26 : 0)), y = Math.max(4, (r.top - wr.top) / k - 11);
+    h += `<button class="dz-pin ${A.pin === d.id ? 'on' : ''}" data-i="pin" data-d="${d.id}" style="left:${x}px;top:${y}px">${n}</button>`;
+  });
+  if (away.length) h += `<button class="dz-more" data-i="go" data-s="${away[0].scene}">${away.length} more on ${SCENE_NAME[away[0].scene]}</button>`;
+  P.innerHTML = h;
+}
+// The open options: built on open and on pick only, never on a preview.
+function popbox() {
+  const B = desk.querySelector('.dz-popbox'); if (!B) return;
+  if (!A.pin) { B.innerHTML = ''; return; }
+  const at = A.popAt || { x: 0, y: 0 };
+  B.innerHTML = `<div class="dz-panel dz-pop" data-area="picker" style="left:${at.x}px;top:${at.y}px;${A.popAt ? '' : 'visibility:hidden'}">${decHTML(decOf(A.pin))}</div>`;
+  if (A.popAt) return;
+  // First open: under the parts it changes, else above them. Then it stays put.
+  const wrap = B.parentElement, k = deskK(), wr = wrap.getBoundingClientRect(), pop = B.firstChild;
+  const rs = [...wrap.querySelector('.dz-app').querySelectorAll(decOf(A.pin).hl)].map(el => el.getBoundingClientRect());
+  const W = wr.width / k, H = wr.height / k, ph = pop.getBoundingClientRect().height / k;
+  const top = Math.min(...rs.map(r => r.top)), bot = Math.max(...rs.map(r => r.bottom)), left = Math.min(...rs.map(r => r.left));
+  const yb = (bot - wr.top) / k + 10, ya = (top - wr.top) / k - ph - 10;
+  A.popAt = { x: Math.max(8, Math.min((left - wr.left) / k, W - 308)), y: yb + ph < H - 8 ? yb : Math.max(8, ya) };
+  pop.style.left = A.popAt.x + 'px'; pop.style.top = A.popAt.y + 'px'; pop.style.visibility = '';
+}
+function comments() {
+  const box = desk.querySelector('.dz-cms'); if (!box) return;
+  box.innerHTML = A.cms.filter(c => c.scene === A.scene).map((c) => { const i = A.cms.indexOf(c); return `<div class="dz-cm" style="left:${c.x}px;top:${c.y - 22}px"><i>${i + 1}</i>${c.text ? `<span>${esc(c.text)}</span>` : `<input data-cmi="${i}" placeholder="Comment, then Return">`}</div>`; }).join('');
+  box.querySelector('input')?.focus();
+}
+function refreshOpts() {
+  desk.querySelectorAll('.dz-opt').forEach(o => o.classList.toggle('pv', !!(A.pv && A.pv.id === o.dataset.dec && A.pv.v === o.dataset.v)));
+}
+function setPV(pv) {
+  const same = (A.pv && pv && A.pv.id === pv.id && A.pv.v === pv.v) || (!A.pv && !pv);
+  if (same) return;
+  A.pv = pv; renderApp(); refreshOpts();
+}
+function pick(id, v) { A.c[id] = v; A.pv = null; afterChange(); }
+function afterChange() { const sc = desk.querySelector('.dz-panel:not(.dz-pop)')?.scrollTop; render(); const p = desk.querySelector('.dz-panel:not(.dz-pop)'); if (p && sc) p.scrollTop = sc; }
+function appClick() { return false; }
+
+// Inner input: hover, click, keys, drag, comments.
+let HT = null;
+function hoverIn(ev) {
+  const mode = C('hovermode');
+  const o = ev.target.closest('.dz-opt'), blk = ev.target.closest('.dz-dec');
+  A.hovDec = blk ? blk.dataset.dec : null;
+  const pv = o ? { id: o.dataset.dec, v: o.dataset.v } : null;
+  if (mode === 'instant') return setPV(pv);
+  if (mode === 'hold') { A.hov = pv; if (A.space) setPV(pv); return; }
+  if (mode === 'click') return;
+  clearTimeout(HT);
+  if (pv) HT = setTimeout(() => setPV(pv), 110);
+  else if (A.pv && blk && blk.dataset.dec === A.pv.id) return;
+  else if (A.pv) HT = setTimeout(() => setPV(null), 140);
+}
+function bindDesk() {
+  desk.addEventListener('mouseover', ev => { if (ev.target.closest('.dz-panel')) hoverIn(ev); else if (C('hovermode') !== 'click') { clearTimeout(HT); A.hov = null; A.hovDec = null; if (C('hovermode') === 'intent') HT = setTimeout(() => setPV(null), 140); else if (C('hovermode') === 'instant') setPV(null); } });
+  desk.addEventListener('mouseleave', () => { clearTimeout(HT); A.hov = null; if (C('hovermode') !== 'click') setPV(null); });
+  desk.addEventListener('click', ev => {
+    const t = ev.target;
+    if (A.cm && t.closest('.dz-app')) {
+      const wr = desk.querySelector('.dz-appwrap').getBoundingClientRect(), k = deskK();
+      const lab = t.closest('[data-label]')?.dataset.label || t.closest('button')?.textContent.trim() || SCENE_NAME[A.scene];
+      A.cms.push({ x: (ev.clientX - wr.left) / k, y: (ev.clientY - wr.top) / k, scene: A.scene, label: lab, text: '' });
+      A.cm = false; desk.querySelector('.dz')?.classList.remove('cm'); desk.querySelector('[data-i="cm"]')?.classList.remove('on'); comments(); return;
+    }
+    const o = t.closest('.dz-opt');
+    if (o) {
+      const pv = { id: o.dataset.dec, v: o.dataset.v };
+      if (C('hovermode') === 'click' && !(A.pv && A.pv.id === pv.id && A.pv.v === pv.v)) return setPV(pv);
+      return pick(pv.id, pv.v);
+    }
+    const b = t.closest('[data-i], [data-iscene]'); if (!b) return;
+    if (b.dataset.iscene) { if (SCENE_NAME[b.dataset.iscene]) { A.scene = b.dataset.iscene; A.pin = null; afterChange(); } return; }
+    const i = b.dataset.i;
+    if (i === 'go') { A.scene = b.dataset.s; A.pv = null; A.pin = null; afterChange(); }
+    else if (i === 'next') { if (A.step < TASK_DECS.length - 1) A.step++; afterChange(); }
+    else if (i === 'back') { A.step = Math.max(0, A.step - 1); afterChange(); }
+    else if (i === 'min') { A.min = !A.min; afterChange(); }
+    else if (i === 'cm') { A.cm = !A.cm; desk.querySelector('.dz').classList.toggle('cm', A.cm); b.classList.toggle('on', A.cm); }
+    else if (i === 'copy') { navigator.clipboard?.writeText(taskPicks()); b.textContent = 'Copied'; }
+    else if (i === 'pin') {
+      if (A.pin === b.dataset.d) { A.pin = null; A.popAt = null; A.pv = null; }
+      else { A.pin = b.dataset.d; A.pv = null; A.popAt = null; }
+      renderApp(false); popbox();
+    }
+  });
+  desk.addEventListener('input', ev => {
+    const n = ev.target.dataset.note; if (n) { A.notes[n] = ev.target.value; const ta = desk.querySelector('.dz-foot textarea'); if (ta) ta.value = taskPicks(); }
+  });
+  desk.addEventListener('keydown', ev => {
+    const i = ev.target.dataset.cmi; if (i == null || ev.key !== 'Enter') return;
+    A.cms[+i].text = ev.target.value.trim(); if (!A.cms[+i].text) A.cms.splice(+i, 1); comments(); const ta = desk.querySelector('.dz-foot textarea'); if (ta) ta.value = taskPicks();
+  });
+  // Drag the floating panel by its title.
+  desk.addEventListener('mousedown', ev => {
+    const hd = ev.target.closest('.L-float [data-i="drag"]'); if (!hd || ev.target.closest('button')) return;
+    const k = deskK(), x0 = ev.clientX, y0 = ev.clientY, fx = A.fx, fy = A.fy, p = hd.closest('.dz-panel');
+    const mv = e => { A.fx = Math.max(0, Math.min(DESK.w - 120, fx + (e.clientX - x0) / k)); A.fy = Math.max(0, Math.min(DESK.h - 40, fy + (e.clientY - y0) / k)); p.style.left = A.fx + 'px'; p.style.top = A.fy + 'px'; };
+    const up = () => { removeEventListener('mousemove', mv); removeEventListener('mouseup', up); };
+    addEventListener('mousemove', mv); addEventListener('mouseup', up); ev.preventDefault();
+  });
+  document.addEventListener('keydown', ev => {
+    if (ev.target.closest('input, textarea') || ev.metaKey || ev.ctrlKey) return;
+    if (ev.key === ' ' && C('hovermode') === 'hold') { ev.preventDefault(); if (!A.space) { A.space = true; setPV(A.hov); } }
+    else if ((ev.key === 'c' || ev.key === 'C') && C('feedback') === 'pin') { A.cm = !A.cm; desk.querySelector('.dz')?.classList.toggle('cm', A.cm); desk.querySelector('[data-i="cm"]')?.classList.toggle('on', A.cm); }
+    else if (/^[1-3]$/.test(ev.key) && C('optstyle') === 'seg') { const id = C('flow') === 'one' && C('layout') !== 'pins' ? TASK_DECS[A.step].id : A.hovDec || A.pin; const d = id && decOf(id); if (d && d.opts[+ev.key - 1]) pick(id, d.opts[+ev.key - 1][0]); }
+    else if (ev.key === 'Escape') { A.cm = false; A.pin = null; A.popAt = null; A.pv = null; afterChange(); }
+  });
+  document.addEventListener('keyup', ev => { if (ev.key === ' ' && A.space) { A.space = false; setPV(null); } });
+}
+
+// ================= picker machinery: keep =================
+const KEY = `designr-${PRODUCT}-${VERSION}`;
+let S = null;
+try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+S = S || { c: {}, scene: SCENES[0][0], hover: true };
+DECISIONS.forEach(d => { if (!(d.id in S.c)) S.c[d.id] = d.lock ? LOCKED[d.id] : d.opts[0][0]; });
+let A = fresh(), PV = null;
+const C = id => (S.before && id in BEFORE ? BEFORE[id] : S.c[id]);
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(PV ? { ...S, c: { ...S.c, [PV.id]: PV.orig } } : S)); } catch (e) {} };
+const desk = document.getElementById('desk'), picker = document.getElementById('picker');
+const shot = location.hash.includes('&shot');
+if (shot) document.body.classList.add('shot');
+
+function fit() {
+  const st = document.getElementById('stage').getBoundingClientRect();
+  const k = shot ? 1 : Math.min(st.width / DESK.w, st.height / DESK.h, 1);
+  desk.style.width = DESK.w + 'px'; desk.style.height = DESK.h + 'px';
+  desk.style.transform = `scale(${k})`;
+}
+function render() {
+  desk.className = 'desk ' + deskClass();
+  desk.innerHTML = app();
+  renderApp(false); popbox();
+  markPreview(); audit(); drawGuides();
+}
+function preset(id) { S.scene = id; A.scene = id === 'settings' ? 'settings' : 'home'; A.pv = null; A.pin = null; save(); renderPicker(); }
+
+const optLabel = d => (d.opts.find(o => o[0] === C(d.id)) || [0, C(d.id)])[1];
+function renderPicker() {
+  const open = DECISIONS.filter(d => !d.lock), locked = DECISIONS.filter(d => d.lock);
+  const radios = d => d.opts.map(([v, l, help], i) => {
+    const tag = d.lock ? (LOCKED[d.id] === v ? '<span class="lk">locked</span>' : '') : i === 0 ? '<span class="rec">recommended</span>' : '';
+    return `<button class="pk-opt ${C(d.id) === v ? 'on' : ''}" data-d="${d.id}" data-v="${v}"><span class="r"></span>${esc(l)}<span class="end">${tag}${help ? `<span class="hq" data-help="${esc(help)}">?</span>` : ''}</span></button>`;
+  }).join('');
+  let h = `<h1>${PRODUCT} ${VERSION} · round ${ROUND}</h1><p class="lede">${open.length} open. Hover an option to see it. ? explains it.</p>`;
+  if (Object.keys(BEFORE).length) h += `<div class="pk-ba"><button class="pk-btn ${S.before ? 'on' : ''}" data-a="before">Before</button><button class="pk-btn ${S.before ? '' : 'on'}" data-a="after">After</button><span>B</span></div>`;
+  h += `<div class="pk-notes"><ul>${HOWTO.map(n => `<li>${n}</li>`).join('')}</ul></div>`;
+  h += `<h2>Jump to</h2><div class="pk-scenes">${SCENES.map(([id, n]) => `<button class="pk-btn ${S.scene === id ? 'on' : ''}" data-scene="${id}">${n}</button>`).join('')}</div>`;
+  h += `<button class="pk-tog ${S.hover !== false ? 'on' : ''}" data-a="hover"><i></i>Preview on hover</button><button class="pk-tog ${S.guides ? 'on' : ''}" data-a="guides"><i></i>Alignment guides (G)</button><div class="pk-audit" id="audit"></div>`;
+  h += `<h2>Open</h2>${open.length ? '' : '<p class="lede">Nothing open.</p>'}`;
+  open.forEach(d => { h += `<div class="pk-dec"><b>${esc(d.name)}</b>${d.fb ? `<div class="pk-new">You said: <q>${esc(d.fb)}</q></div>` : ''}${d.note ? `<p>${esc(d.note)}</p>` : ''}${radios(d)}</div>`; });
+  h += `<h2>Locked (${locked.length})</h2>`;
+  if (!S.unlock) {
+    h += locked.map(d => `<div class="pk-lock"><b>${esc(d.name)}</b><span>${esc(optLabel(d))}${C(d.id) !== LOCKED[d.id] ? ' · changed' : ''}</span></div>`).join('');
+    if (locked.length) h += `<button class="pk-btn" style="margin-top:8px" data-a="unlock">Unlock to compare</button>`;
+  } else {
+    h += `<button class="pk-btn" data-a="unlock">Hide the locked options</button>`;
+    locked.forEach(d => { h += `${d.g ? `<h2>${esc(d.g)}</h2>` : ''}<div class="pk-dec"><b>${esc(d.name)}</b>${radios(d)}</div>`; });
+  }
+  h += `<div class="pk-foot"><button class="pk-btn" data-a="copy">Copy my picks</button><button class="pk-btn" data-a="reset">Back to locked picks</button><button class="pk-btn" data-a="demo">Reset demo data</button></div><textarea id="picks" readonly></textarea>`;
+  const top = picker.scrollTop; picker.innerHTML = h; picker.scrollTop = top;
+  document.getElementById('picks').value = picksText();
+  render();
+}
+function picksText() {
+  const line = d => `- ${d.name}: ${optLabel(d)}${d.lock ? (C(d.id) !== LOCKED[d.id] ? ' (changed from the locked pick)' : '') : C(d.id) === d.opts[0][0] ? '' : ' (not the recommendation)'}`;
+  return `# ${PRODUCT} ${VERSION} round ${ROUND} picks\n## Open\n${DECISIONS.filter(d => !d.lock).map(line).join('\n') || '- Nothing open'}\n## Locked\n${DECISIONS.filter(d => d.lock).map(line).join('\n')}\n## Notes\n- `;
+}
+// Hover preview: the option applies while hovered. Leaving restores the pick.
+function previewOn(id, v) {
+  if (S.hover === false) return;
+  const d = DECISIONS.find(x => x.id === id); if (!d) return;
+  if (PV && PV.id !== id) previewOff(true);
+  if (!PV) PV = { id, orig: S.c[id] };
+  if (PV.v === v) return;
+  PV.v = v; S.c[id] = v;
+  if (d.scene && S.scene !== d.scene) S.scene = d.scene;
+  render();
+}
+function previewOff(silent) { if (!PV) return; S.c[PV.id] = PV.orig; PV = null; save(); if (!silent) render(); }
+function markPreview() {
+  const d = PV && DECISIONS.find(x => x.id === PV.id);
+  if (d && d.hl) desk.querySelectorAll(d.hl).forEach(el => el.classList.add('pvhl'));
+}
+// Counter: text sizes, colours and weights in view.
+function audit() {
+  const box = document.getElementById('audit'); if (!box) return;
+  const sz = new Set(), co = new Set(), wt = new Set(), n = {};
+  for (const el of desk.querySelectorAll('*')) {
+    if (el.closest('#guides, [data-os]')) continue;
+    const own = [...el.childNodes].some(x => x.nodeType === 3 && x.textContent.trim()) || (el.matches('input, textarea') && el.value);
+    if (!own) continue;
+    const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue;
+    const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || +cs.opacity === 0) continue;
+    const f = parseFloat(cs.fontSize); sz.add(f); n[f] = (n[f] || 0) + 1; co.add(cs.color); wt.add(cs.fontWeight);
+  }
+  box.innerHTML = `In view: <b>${sz.size}</b> sizes · <b>${co.size}</b> text colours · <b>${wt.size}</b> weights<br>${[...sz].sort((a, b) => b - a).map(f => `${f} px ×${n[f]}`).join(' · ')}`;
+}
+// Alignment guides (G). Areas: [data-area]. Centred items: [data-centred] or .btn.
+// Green: a left edge that 3 or more items share. Blue: a shared right edge. Red: 1 to 5 px off a line.
+const CENTRED = '[data-centred], .btn';
+function drawGuides() {
+  desk.querySelector('#guides')?.remove(); window.__guides = null;
+  if (!S.guides) return;
+  const k = desk.getBoundingClientRect().width / DESK.w, dr = desk.getBoundingClientRect();
+  const X = x => (x - dr.left) / k, Y = y => (y - dr.top) / k;
+  let out = '', misses = [], cols = 0;
+  desk.querySelectorAll('[data-area]').forEach(area => {
+    const ar = area.getBoundingClientRect(), L = [], R = [];
+    const vis = r => r.width > 0 && r.height > 0 && r.bottom > ar.top && r.top < ar.bottom;
+    const push = (arr, x, r, what) => arr.push({ x: Math.round(X(x) * 2) / 2, t: Y(r.top), b: Y(r.bottom), l: X(r.left), w: r.width / k, what });
+    const tw = document.createTreeWalker(area, NodeFilter.SHOW_TEXT, { acceptNode: x => x.textContent.trim() ? 1 : 2 });
+    for (let t; (t = tw.nextNode());) {
+      const el = t.parentElement; if (!el || el.closest(CENTRED)) continue;
+      const cs = getComputedStyle(el); if (cs.textAlign === 'center' || cs.textAlign === 'right' || cs.marginLeft === 'auto') continue;
+      const rg = document.createRange(); rg.selectNodeContents(t); const r = rg.getClientRects()[0];
+      if (r && vis(r)) push(L, r.left, r, t.textContent.trim().slice(0, 24));
+    }
+    area.querySelectorAll('input, textarea').forEach(el => {
+      const r = el.getBoundingClientRect(); if (!vis(r) || el.closest(CENTRED)) return;
+      const cs = getComputedStyle(el); push(L, r.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth), r, (el.value || el.placeholder || '').slice(0, 24));
+    });
+    area.querySelectorAll('.ic, svg').forEach(el => {
+      const r = el.getBoundingClientRect(); if (!vis(r) || el.closest(CENTRED)) return;
+      if (!el.previousElementSibling) push(L, r.left, r, 'icon');
+      if (!el.nextElementSibling && !el.nextSibling?.textContent?.trim()) push(R, r.right, r, 'icon');
+    });
+    const group = arr => { const g = []; arr.sort((a, b) => a.x - b.x).forEach(e => { const last = g[g.length - 1]; if (last && e.x - last.x0 <= .75) last.items.push(e); else g.push({ x0: e.x, items: [e] }); }); g.forEach(c => { c.x = c.items.reduce((a, b) => a + b.x, 0) / c.items.length; }); return g; };
+    const lines = (arr, cls) => {
+      const g = group(arr), strong = g.filter(c => c.items.length >= 3);
+      strong.forEach(c => { cols++; out += `<div class="gv ${cls}" style="left:${c.x}px;top:${Y(ar.top)}px;height:${ar.height / k}px"><span>${Math.round(c.x - X(ar.left))}</span></div>`; });
+      g.filter(c => c.items.length < 3).forEach(c => {
+        const near = strong.find(s2 => Math.abs(s2.x - c.x) >= 1 && Math.abs(s2.x - c.x) <= 5); if (!near) return;
+        c.items.forEach(it => { const d = (it.x - near.x).toFixed(1); misses.push({ area: area.dataset.area, what: it.what, x: it.x, off: +d }); out += `<div class="bx" style="left:${it.l}px;top:${it.t}px;width:${Math.max(it.w, 2)}px;height:${it.b - it.t}px"><span>${d > 0 ? '+' : ''}${d}</span></div>`; });
+      });
+    };
+    lines(L, ''); lines(R, 'r');
+    out += `<div class="ol" style="left:${X(ar.left)}px;top:${Y(ar.top)}px;width:${ar.width / k}px;height:${ar.height / k}px"></div>`;
+  });
+  window.__guides = misses;
+  desk.insertAdjacentHTML('beforeend', `<div id="guides">${out}<div class="legend"><b>Alignment guides</b> · G to hide<br>green: shared left edge (3+) · blue: shared right edge<br>red: ${misses.length} item${misses.length === 1 ? '' : 's'} 1 to 5 px off a line · ${cols} lines</div></div>`);
+}
+
+picker.addEventListener('click', ev => {
+  const t = ev.target.closest('button'); if (!t) return;
+  const a = t.dataset.a;
+  if (t.dataset.scene) return preset(t.dataset.scene);
+  if (t.dataset.d) { PV = null; S.c[t.dataset.d] = t.dataset.v; S.before = false; }
+  else if (a === 'before' || a === 'after') S.before = a === 'before';
+  else if (a === 'hover') S.hover = S.hover === false;
+  else if (a === 'guides') S.guides = !S.guides;
+  else if (a === 'unlock') S.unlock = !S.unlock;
+  else if (a === 'copy') { navigator.clipboard?.writeText(picksText()); t.textContent = 'Copied'; return; }
+  else if (a === 'reset') { DECISIONS.forEach(d => { S.c[d.id] = d.lock ? LOCKED[d.id] : d.opts[0][0]; }); S.before = false; }
+  else if (a === 'demo') A = fresh();
+  else return;
+  save(); renderPicker();
+});
+// Hover intent: show after a short pause; keep the preview in the gaps of the same decision.
+let PT = null;
+picker.addEventListener('mouseover', ev => {
+  const o = ev.target.closest('.pk-opt[data-d]'), blk = ev.target.closest('.pk-dec');
+  clearTimeout(PT);
+  if (o) PT = setTimeout(() => previewOn(o.dataset.d, o.dataset.v), 90);
+  else if (PV && blk && blk.querySelector(`[data-d="${PV.id}"]`)) return;
+  else if (PV) PT = setTimeout(() => previewOff(), 140);
+});
+picker.addEventListener('mouseleave', () => { clearTimeout(PT); previewOff(); });
+desk.addEventListener('click', ev => { const t = ev.target.closest('button'); if (t && appClick(t)) { save(); renderPicker(); } });
+document.addEventListener('keydown', ev => {
+  if (ev.target.closest('input, textarea') || ev.metaKey || ev.ctrlKey) return;
+  if (ev.key === 'g' || ev.key === 'G') { S.guides = !S.guides; save(); renderPicker(); }
+  else if ((ev.key === 'b' || ev.key === 'B') && Object.keys(BEFORE).length) { S.before = !S.before; save(); renderPicker(); }
+});
+window.addEventListener('resize', () => { fit(); drawGuides(); });
+window.addEventListener('hashchange', () => { const id = location.hash.slice(1).split('&')[0]; if (id) preset(id); });
+bindDesk();
+fit();
+const scene0 = location.hash.slice(1).split('&')[0];
+if (scene0 && SCENES.some(s => s[0] === scene0)) preset(scene0); else renderPicker();
+document.fonts?.ready.then(() => { fit(); drawGuides(); });
+</script>
+</body>
+</html>
