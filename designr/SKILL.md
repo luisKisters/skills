@@ -26,7 +26,7 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
     - Give 2 to 5 options per decision. The first option is your recommendation.
     - Tell the user how to open it (`open design/mockup-vN/index.html`) and what to look at.
 3. Round
-    - The user clicks through, picks, and pastes the "Copy my picks" text with notes.
+    - The user clicks through, picks, and pastes the "Copy my picks" text with notes. Notes on one element come from Agentation (⌘⇧F in the mockup) with a CSS path.
     - Lock the picks: update `LOCKED` and the round section in `DECISIONS.md` ([templates/DECISIONS.md](templates/DECISIONS.md)).
     - Make new decisions only from the feedback. Quote the feedback word for word in the decision.
     - Fix bugs the user found without a decision. Write them under "Fixed without a decision".
@@ -67,7 +67,7 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
 
 ## Check list before you hand a round to the user
 - [ ] Every open decision has 2 to 5 working options, a quote of the feedback and a scene.
-- [ ] Hover on an option shows it and outlines what changes.
+- [ ] Hover on an option shows it after a short pause, with no flicker in the gaps, and what changes glows once.
 - [ ] Every option has a "?" text that says what it does.
 - [ ] `LOCKED` and `DECISIONS.md` agree.
 - [ ] G shows no red box in the scenes you changed.

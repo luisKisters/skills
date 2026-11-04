@@ -15,7 +15,7 @@ input { font: inherit; color: inherit; background: none; border: 0; outline: 0; 
 .shot #picker { display: none; }
 
 /* ---------- picker (outside the app) ---------- */
-#picker { width: 380px; flex: none; border-left: 1px solid #222; background: #111113; overflow-y: auto; padding: 18px 18px 40px; }
+#picker { width: 380px; flex: none; border-left: 1px solid #222; background: #111113; overflow-y: auto; padding: 18px 18px 84px; }
 #picker h1 { font-size: 15px; font-weight: 650; color: #f2f2f4; margin: 0; }
 #picker h2 { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: #6c6c74; font-weight: 600; margin: 22px 0 8px; }
 #picker .lede { color: #8a8a92; font-size: 12px; margin: 4px 0 14px; }
@@ -52,8 +52,10 @@ input { font: inherit; color: inherit; background: none; border: 0; outline: 0; 
 .pk-foot { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 22px; }
 #picks { margin-top: 10px; width: 100%; height: 150px; background: #141417; color: #bdbdc4; border: 1px solid #25252a; border-radius: 8px; padding: 8px; font: 11px/1.45 ui-monospace, Menlo, monospace; resize: vertical; }
 
-/* ---------- preview outline and alignment guides ---------- */
-.pvhl { outline: 1.5px solid rgba(90, 160, 255, .9) !important; outline-offset: 1px; }
+/* ---------- preview: crossfade, short glow, alignment guides ---------- */
+.ghost { pointer-events: none; z-index: 140; transition: opacity 140ms ease; }
+.pvhl { animation: pvpulse 900ms ease-out forwards; }
+@keyframes pvpulse { 0% { box-shadow: 0 0 0 0 rgba(90,160,255,.9), 0 0 0 1.5px rgba(90,160,255,.9); } 60% { box-shadow: 0 0 0 8px rgba(90,160,255,0), 0 0 0 1.5px rgba(90,160,255,.9); } 100% { box-shadow: 0 0 0 8px rgba(90,160,255,0), 0 0 0 1.5px transparent; } }
 #guides { position: absolute; inset: 0; pointer-events: none; z-index: 150; }
 #guides .gv { position: absolute; width: 0; border-left: 1px solid rgba(64, 214, 120, .55); }
 #guides .gv.r { border-left-color: rgba(90, 160, 255, .55); }
@@ -97,7 +99,7 @@ input { font: inherit; color: inherit; background: none; border: 0; outline: 0; 
 const PRODUCT = 'Product', VERSION = 'v1', ROUND = 1;
 const DESK = { w: 1440, h: 900 };            // the real window size
 const SCENES = [['home', 'Home'], ['detail', 'Detail'], ['system', 'Design system']];
-const HOWTO = ['Everything is clickable.', 'Keys: G alignment guides, B before / after.', 'The scene buttons only jump to a starting state.'];
+const HOWTO = ['Everything is clickable.', 'Keys: G alignment guides, B before / after.', 'The scene buttons only jump to a starting state.', 'Notes on an element: ⌘⇧F (Agentation), click it, write. "Copy my picks" takes the notes.'];
 // The picks the user locked. Each round adds the new locks here and in DECISIONS.md.
 const LOCKED = { accent: 'ink' };
 // Values for the Before switch (B): the last round, before the change you show.
@@ -168,7 +170,12 @@ function fit() {
   desk.style.width = DESK.w + 'px'; desk.style.height = DESK.h + 'px';
   desk.style.transform = `scale(${k})`;
 }
-function render() {
+// fade: the old frame stays on top and fades out in 140 ms (hover previews only).
+function render(fade) {
+  if (fade && !shot) {
+    const g = desk.cloneNode(true); g.removeAttribute('id'); g.classList.add('ghost'); g.querySelector('#guides')?.remove();
+    desk.after(g); requestAnimationFrame(() => requestAnimationFrame(() => { g.style.opacity = 0; })); setTimeout(() => g.remove(), 200);
+  }
   desk.className = 'desk ' + deskClass();
   desk.innerHTML = app();
   markPreview(); audit(); drawGuides();
@@ -204,9 +211,20 @@ function renderPicker() {
 }
 function picksText() {
   const line = d => `- ${d.name}: ${optLabel(d)}${d.lock ? (C(d.id) !== LOCKED[d.id] ? ' (changed from the locked pick)' : '') : C(d.id) === d.opts[0][0] ? '' : ' (not the recommendation)'}`;
-  return `# ${PRODUCT} ${VERSION} round ${ROUND} picks\n## Open\n${DECISIONS.filter(d => !d.lock).map(line).join('\n') || '- Nothing open'}\n## Locked\n${DECISIONS.filter(d => d.lock).map(line).join('\n')}\n## Notes\n- `;
+  const scene = id => (SCENES.find(x => x[0] === id) || [0, id])[1];
+  const notes = (S.notes || []).map(n => `- ${scene(n.scene)} · \`${n.path}\`${n.text ? ` ("${n.text}")` : ''}: ${n.comment}`).join('\n');
+  return `# ${PRODUCT} ${VERSION} round ${ROUND} picks\n## Open\n${DECISIONS.filter(d => !d.lock).map(line).join('\n') || '- Nothing open'}\n## Locked\n${DECISIONS.filter(d => d.lock).map(line).join('\n')}${notes ? `\n## Notes on elements\n${notes}` : ''}\n## Notes\n- `;
 }
-// Hover preview: the option applies while hovered. Leaving restores the pick.
+// Notes from Agentation (the module script at the end). They go into the picks text.
+const NOTES = {
+  set(a) { const old = (S.notes || []).find(n => n.id === a.id); S.notes = (S.notes || []).filter(n => n.id !== a.id).concat({ id: a.id, scene: old ? old.scene : S.scene, path: a.elementPath, text: NOTES.text(a), comment: a.comment }); NOTES.done(); },
+  text(a) { let el = null; try { el = document.querySelector(a.elementPath); } catch (e) {} return (a.selectedText || el?.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 60); },
+  del(a) { S.notes = (S.notes || []).filter(n => n.id !== a.id); NOTES.done(); },
+  clear() { S.notes = []; NOTES.done(); },
+  done() { save(); const p = document.getElementById('picks'); if (p) p.value = picksText(); },
+};
+// Hover preview: the option applies while hovered, its scene opens, and the hl elements glow once.
+// Only the app renders again, never the picker, so the picker does not move.
 function previewOn(id, v) {
   if (S.hover === false) return;
   const d = DECISIONS.find(x => x.id === id); if (!d) return;
@@ -215,9 +233,9 @@ function previewOn(id, v) {
   if (PV.v === v) return;
   PV.v = v; S.c[id] = v;
   if (d.scene && S.scene !== d.scene) S.scene = d.scene;
-  render();
+  render(true);
 }
-function previewOff(silent) { if (!PV) return; S.c[PV.id] = PV.orig; PV = null; save(); if (!silent) render(); }
+function previewOff(silent) { if (!PV) return; S.c[PV.id] = PV.orig; PV = null; save(); if (!silent) render(true); }
 function markPreview() {
   const d = PV && DECISIONS.find(x => x.id === PV.id);
   if (d && d.hl) desk.querySelectorAll(d.hl).forEach(el => el.classList.add('pvhl'));
@@ -285,7 +303,7 @@ picker.addEventListener('click', ev => {
   const t = ev.target.closest('button'); if (!t) return;
   const a = t.dataset.a;
   if (t.dataset.scene) return preset(t.dataset.scene);
-  if (t.dataset.d) { PV = null; S.c[t.dataset.d] = t.dataset.v; S.before = false; }
+  if (t.dataset.d) { clearTimeout(PT); PV = null; S.c[t.dataset.d] = t.dataset.v; S.before = false; }
   else if (a === 'before' || a === 'after') S.before = a === 'before';
   else if (a === 'hover') S.hover = S.hover === false;
   else if (a === 'guides') S.guides = !S.guides;
@@ -296,8 +314,16 @@ picker.addEventListener('click', ev => {
   else return;
   save(); renderPicker();
 });
-picker.addEventListener('mouseover', ev => { const o = ev.target.closest('.pk-opt[data-d]'); if (o) previewOn(o.dataset.d, o.dataset.v); else if (PV) previewOff(); });
-picker.addEventListener('mouseleave', () => previewOff());
+// Hover intent: show an option after 90 ms. The gaps inside one decision keep the preview, so nothing flickers.
+let PT = null;
+picker.addEventListener('mouseover', ev => {
+  const o = ev.target.closest('.pk-opt[data-d]'), blk = ev.target.closest('.pk-dec');
+  clearTimeout(PT);
+  if (o) PT = setTimeout(() => previewOn(o.dataset.d, o.dataset.v), 90);
+  else if (PV && blk && blk.querySelector(`[data-d="${PV.id}"]`)) return;
+  else if (PV) PT = setTimeout(() => previewOff(), 140);
+});
+picker.addEventListener('mouseleave', () => { clearTimeout(PT); previewOff(); });
 desk.addEventListener('click', ev => { const t = ev.target.closest('button'); if (t && appClick(t)) { save(); renderPicker(); } });
 document.addEventListener('keydown', ev => {
   if (ev.target.closest('input, textarea') || ev.metaKey || ev.ctrlKey) return;
@@ -310,6 +336,23 @@ fit();
 const scene0 = location.hash.slice(1).split('&')[0];
 if (scene0 && SCENES.some(s => s[0] === scene0)) preset(scene0); else renderPicker();
 document.fonts?.ready.then(() => { fit(); drawGuides(); });
+</script>
+<div id="agentation"></div>
+<script type="module">
+// Agentation (agentation.com): ⌘⇧F, click any element, write a note. It loads from esm.sh, so it needs the network.
+// The mockup works without it. Its notes go into "Copy my picks" through NOTES.
+if (!shot) {
+  const deps = '?deps=react@18.3.1,react-dom@18.3.1';
+  try {
+    const [React, { createRoot }, { Agentation }] = await Promise.all([
+      import('https://esm.sh/react@18.3.1'), import('https://esm.sh/react-dom@18.3.1/client' + deps), import('https://esm.sh/agentation@3.1.2' + deps)]);
+    createRoot(document.getElementById('agentation')).render(React.createElement(Agentation, {
+      appName: `${PRODUCT} ${VERSION} round ${ROUND}`,
+      identifyingAttributes: ['data-area', 'data-d', 'data-v', 'data-go', 'data-open'],
+      onAnnotationAdd: NOTES.set, onAnnotationUpdate: NOTES.set, onAnnotationDelete: NOTES.del, onAnnotationsClear: NOTES.clear,
+    }));
+  } catch (e) { console.info('Agentation did not load. The mockup works without it.', e); }
+}
 </script>
 </body>
 </html>

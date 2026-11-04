@@ -23,11 +23,12 @@ One HTML file per design version: `design/mockup-vN/index.html`. Start from [../
 | How to | 2 to 4 lines: what is clickable, the keys. |
 | Before / After (B) | Shows the last round against the change. Values in `BEFORE`. Only when a round changes many things at once. |
 | Jump to | One button per scene. |
-| Preview on hover | On by default. The hovered option applies, its scene opens, and the `hl` elements get an outline. Leave restores the pick. |
+| Preview on hover | On by default. After 90 ms on an option, it applies and its scene opens. The app crossfades in 140 ms and the `hl` elements glow once. The gaps inside one decision keep the preview; leaving the decision restores the pick after 140 ms. Only the app renders again, never the picker, so nothing under the mouse moves. |
 | Counter | Text sizes, text colours and weights in view. Use it to argue for a clean-up. |
 | Alignment guides (G) | Green: a left edge that 3 or more items share. Blue: a shared right edge. Red box: 1 to 5 px off a line, with the offset. `window.__guides` holds the misses for scripts. |
 | Open | One block per open decision: name, "You said: <quote>", where to look, the options. First option tagged "recommended". |
 | Locked | A one-line summary per lock. "Unlock to compare" shows the old options again. A changed lock says "changed". |
+| Agentation | ⌘⇧F, click any element, write a note ([agentation.com](https://www.agentation.com)). Loads from esm.sh; without the network the mockup works without it. Notes go into the picks text under "Notes on elements". |
 | Foot | Copy my picks, Back to locked picks, Reset demo data, and the picks text. |
 
 ## A decision
@@ -53,6 +54,9 @@ One HTML file per design version: `design/mockup-vN/index.html`. Start from [../
 - List rows: Hairline between rows (not the recommendation)
 ## Locked
 - Accent: Ink
+## Notes on elements
+- Home · `#desk > .main[data-area="main"] > .row[data-open="1"]` ("Quarterly plan"): the rows feel too tall
 ## Notes
-- the rows feel too tall
+- less grey
 ```
+Read a note on an element with its scene: open the scene, find the element by the CSS path.
