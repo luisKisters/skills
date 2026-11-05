@@ -1,4 +1,5 @@
 # designr v1 decisions
+Superseded by `design/mockup-v2/` (round 3, the final version). Kept as the record of rounds 1 and 2.
 Mockup: `design/mockup-v1/index.html`. The picker shows the same state.
 ## Locked in round 1
 | Element | Pick |

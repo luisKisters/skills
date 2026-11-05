@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>designr v2</title>
+<!-- designr v2: the final picker on a sample Tasks app. Built from templates/mockup.html. -->
+<style>
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: #08080a; color: #d8d8dc; font: 13px/1.4 -apple-system, system-ui, sans-serif; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: inherit; padding: 0; }
+input { font: inherit; color: inherit; background: none; border: 0; outline: 0; }
+#root { display: flex; height: 100%; }
+#stage { flex: 1; position: relative; overflow: hidden; }
+.shot #picker { display: none; }
+
+/* ---------- picker (outside the app) ---------- */
+#picker { width: 380px; flex: none; border-left: 1px solid #222; background: #111113; overflow-y: auto; padding: 18px 18px 84px; }
+#picker h1 { font-size: 15px; font-weight: 650; color: #f2f2f4; margin: 0; }
+#picker h2 { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: #6c6c74; font-weight: 600; margin: 22px 0 8px; }
+#picker .lede { color: #8a8a92; font-size: 12px; margin: 4px 0 14px; }
+.pk-btn { padding: 5px 9px; border-radius: 7px; background: #1b1b1f; color: #b4b4bb; font-size: 12px; border: 1px solid #26262b; }
+.pk-btn:hover { background: #222227; color: #eee; }
+.pk-btn.on { background: #ececf0; color: #111; border-color: #ececf0; }
+.pk-scenes { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.pk-notes { padding: 10px 12px; border-radius: 9px; background: #17171a; border: 1px solid #222226; color: #a6a6ae; font-size: 12px; }
+.pk-notes ul { margin: 0; padding-left: 15px; }
+.pk-ba { display: flex; gap: 4px; align-items: center; margin-bottom: 10px; }
+.pk-ba span { color: #6c6c74; font-size: 11px; margin-left: 4px; }
+.pk-tog { display: flex; gap: 8px; align-items: center; color: #a6a6ae; font-size: 12px; margin-top: 6px; }
+.pk-tog i { width: 24px; height: 14px; border-radius: 7px; background: #2a2a30; position: relative; flex: none; }
+.pk-tog i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: #8a8a92; transition: transform .15s; }
+.pk-tog.on i { background: #ececf0; } .pk-tog.on i::after { transform: translateX(10px); background: #111; }
+.pk-audit { margin-top: 8px; color: #8a8a92; font-size: 11.5px; }
+.pk-audit b { color: #eee; }
+.pk-dec { margin-bottom: 14px; }
+.pk-dec > b { color: #f2f2f4; font-size: 12.5px; }
+.pk-dec p { color: #8a8a92; font-size: 12px; margin: 3px 0 6px; }
+.pk-new { color: #a6a6ae; font-size: 12px; margin: 3px 0 6px; }
+.pk-new q { color: #e6e6ea; }
+.pk-opt { display: flex; align-items: center; gap: 8px; width: 100%; padding: 5px 8px; border-radius: 7px; color: #b4b4bb; font-size: 12px; }
+.pk-opt:hover { background: #1b1b1f; color: #eee; }
+.pk-opt.on { color: #f4f4f6; background: #1d1d22; }
+.pk-opt .r { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #4a4a52; flex: none; }
+.pk-opt.on .r { border-color: #f4f4f6; background: radial-gradient(#f4f4f6 0 2.5px, transparent 3px); }
+.pk-opt .end { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.pk-opt .rec, .pk-opt .lk { font-size: 10.5px; color: #6c6c74; }
+.pk-opt .hq { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #3a3a42; color: #8a8a92; font-size: 10px; display: inline-grid; place-items: center; position: relative; }
+.pk-opt .hq:hover::after { content: attr(data-help); position: absolute; right: -4px; top: 22px; width: 270px; padding: 8px 10px; border-radius: 8px; background: #26262c; border: 1px solid #3a3a42; color: #e6e6ea; font-size: 11.5px; line-height: 1.45; white-space: normal; z-index: 10; }
+.pk-lock { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; padding: 3px 0; color: #8a8a92; }
+.pk-lock b { font-weight: 500; color: #c4c4cb; }
+.pk-foot { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 22px; }
+/* Agentation toolbar: bottom right of the app, not over the picker. */
+.agt-host { right: 396px !important; bottom: 16px !important; }
+#picker .read { color: #a6a6ae; font-size: 12px; margin: -6px 0 14px; padding-left: 10px; border-left: 2px solid #2a2a30; }
+#picks { margin-top: 10px; width: 100%; height: 150px; background: #141417; color: #bdbdc4; border: 1px solid #25252a; border-radius: 8px; padding: 8px; font: 11px/1.45 ui-monospace, Menlo, monospace; resize: vertical; }
+
+/* ---------- preview: crossfade, short glow, alignment guides ---------- */
+.ghost { pointer-events: none; z-index: 140; transition: opacity 140ms ease; }
+.pvhl { animation: pvpulse 900ms ease-out forwards; }
+@keyframes pvpulse { 0% { box-shadow: 0 0 0 0 rgba(90,160,255,.9), 0 0 0 1.5px rgba(90,160,255,.9); } 60% { box-shadow: 0 0 0 8px rgba(90,160,255,0), 0 0 0 1.5px rgba(90,160,255,.9); } 100% { box-shadow: 0 0 0 8px rgba(90,160,255,0), 0 0 0 1.5px transparent; } }
+#guides { position: absolute; inset: 0; pointer-events: none; z-index: 150; }
+#guides .gv { position: absolute; width: 0; border-left: 1px solid rgba(64, 214, 120, .55); }
+#guides .gv.r { border-left-color: rgba(90, 160, 255, .55); }
+#guides .gv span { position: absolute; top: 2px; left: 2px; font: 9px ui-monospace, Menlo, monospace; color: rgba(64, 214, 120, .95); background: rgba(0,0,0,.6); padding: 0 2px; }
+#guides .bx { position: absolute; outline: 1px solid rgba(255, 70, 90, .95); background: rgba(255, 70, 90, .12); }
+#guides .bx span { position: absolute; top: -12px; left: 0; font: 9px ui-monospace, Menlo, monospace; color: #fff; background: rgba(220, 40, 60, .9); padding: 0 3px; white-space: nowrap; }
+#guides .ol { position: absolute; outline: 1px dashed rgba(255, 255, 255, .14); }
+#guides .legend { position: absolute; left: 12px; bottom: 12px; padding: 8px 10px; border-radius: 8px; background: rgba(10,10,12,.88); border: 1px solid rgba(255,255,255,.12); font: 11px/1.5 -apple-system, system-ui; color: #ddd; }
+
+/* ================= the app: Tasks (light) ================= */
+/* Tokens. Every value in the app CSS below is a token. */
+.desk { --bg: #fafafa; --side: #f3f3f3; --card: #fff; --hover: #ededed; --line: #e6e6e6;
+  --fg: #171717; --fg2: #737373; --fg3: #b5b5b5; --a: #171717; --aon: #fff;
+  --font: -apple-system, system-ui, sans-serif; --fs-title: 26px; --fs-head: 15px; --fs-ui: 13px; --fs-small: 12px;
+  --rh: 32px; --h-nav: 28px; --h-ctl: 32px; --h-set: 52px; --r-row: 6px; --r-ctl: 8px; --r-card: 12px; }
+.desk.acc-blue { --a: #0a6cff; } .desk.acc-green { --a: #15803d; }
+.desk.d-28 { --rh: 28px; } .desk.d-40 { --rh: 40px; }
+.desk { position: absolute; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; display: flex; background: var(--bg); color: var(--fg); font: var(--fs-ui)/1.4 var(--font); -webkit-font-smoothing: antialiased; }
+.side { width: 220px; flex: none; background: var(--side); border-right: 1px solid var(--line); padding: 16px 12px; }
+.brand { display: flex; align-items: center; height: var(--h-ctl); padding: 0 8px; margin-bottom: 8px; font-weight: 650; }
+.nav { display: flex; align-items: center; gap: 8px; width: 100%; height: var(--h-nav); padding: 0 8px; border-radius: var(--r-row); color: var(--fg2); }
+.nav:hover { background: var(--hover); color: var(--fg); }
+.nav.on { background: var(--a); color: var(--aon); }
+.nav .ic { width: 12px; height: 12px; border-radius: 3px; background: currentColor; opacity: .45; flex: none; }
+.main { flex: 1; min-width: 0; padding: 28px 40px; }
+.hdr { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; min-height: var(--h-ctl); margin-bottom: 18px; }
+.hdr h1 { margin: 0; font-size: var(--fs-title); font-weight: 650; letter-spacing: -.02em; }
+.sub { color: var(--fg2); font-size: var(--fs-small); margin-top: 2px; }
+.t-compact .hdr { align-items: center; }
+.t-compact .hdr h1 { display: inline; font-size: var(--fs-head); letter-spacing: 0; }
+.t-compact .hdr .sub { display: inline; margin-left: 8px; }
+.tabs { display: flex; gap: 4px; margin-left: -12px; }
+.tab { display: grid; place-items: center; height: var(--h-ctl); padding: 0 12px; border-radius: var(--r-ctl); color: var(--fg2); }
+.tab.on { background: var(--hover); color: var(--fg); }
+.btn { height: var(--h-ctl); padding: 0 14px; border-radius: var(--r-ctl); background: var(--a); color: var(--aon); font-weight: 600; flex: none; }
+.row { display: flex; align-items: center; gap: 10px; width: calc(100% + 20px); height: var(--rh); padding: 0 10px; margin: 0 -10px; border-radius: var(--r-row); }
+.row:hover { background: var(--hover); }
+.row .ck { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--fg3); flex: none; }
+.row.done .ck { background: var(--a); border-color: var(--a); }
+.row.done .t { color: var(--fg2); text-decoration: line-through; }
+.row .dt { margin-left: auto; color: var(--fg2); font-size: var(--fs-small); }
+.rows-lines .row { border-radius: 0; box-shadow: inset 0 -1px var(--line); }
+.rows-boxed .row { width: 100%; margin: 0 0 6px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); border-radius: var(--r-ctl); }
+.set { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; max-width: 560px; height: var(--h-set); border-bottom: 1px solid var(--line); }
+.set .sub { margin-top: 0; }
+.sw { position: relative; width: 34px; height: 20px; border-radius: 10px; background: var(--fg3); flex: none; }
+.sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--card); box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.sw.on { background: var(--a); } .sw.on::after { left: 16px; }
+.ck2 { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--fg3); color: var(--aon); font-size: 11px; flex: none; }
+.ck2.on { background: var(--a); border-color: var(--a); }
+.seg2 { display: flex; padding: 2px; border-radius: var(--r-ctl); background: var(--hover); flex: none; }
+.seg2 span { display: grid; place-items: center; height: 24px; padding: 0 10px; border-radius: var(--r-row); color: var(--fg2); font-size: var(--fs-small); }
+.seg2 span.on { background: var(--card); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.card { max-width: 560px; padding: 8px 16px; border-radius: var(--r-card); background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+.tok { display: flex; align-items: center; gap: 10px; height: var(--h-ctl); }
+.tok i { width: 14px; height: 14px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--line); flex: none; }
+.tok span { margin-left: auto; color: var(--fg2); font-size: var(--fs-small); font-family: ui-monospace, Menlo, monospace; }
+.card + .card { margin-top: 16px; }
+</style>
+</head>
+<body>
+<div id="root"><div id="stage"><div class="desk" id="desk"></div></div><aside id="picker"></aside></div>
+<script>
+// ================= edit for each round =================
+const PRODUCT = 'designr', VERSION = 'v2', ROUND = 3;
+const DESK = { w: 1280, h: 800 };            // the real window size
+const SCENES = [['home', 'Inbox'], ['settings', 'Settings'], ['system', 'Design system']];
+const HOWTO = ['A sample Tasks app. Everything on the left is clickable: tasks, the sidebar, the switches.', 'Keys: G alignment guides.', 'The scene buttons only jump to a starting state.', 'Notes on one element: turn on Agentation below, click the element, write. "Copy my picks" takes the notes.'];
+// The design read and dials from tasteskill (design-taste-frontend). Empty hides it.
+const READ = 'Reading this as: a calm task app for one person, Linear-style minimal, system font, one accent. Dials: variance 3, motion 3, density 5.';
+// The picks the user locked. Each round adds the new locks here and in DECISIONS.md.
+const LOCKED = { accent: 'ink', density: '32' };
+// Values for the Before switch (B): the last round, before the change you show.
+const BEFORE = {};
+// g: group title, id: key, name: what the user sees, fb: the user's words, note: where to look,
+// scene: scene to open on hover, hl: CSS selector of what changes, lock: true when locked,
+// opts: [value, label, help]. The first open option is the recommendation.
+const DECISIONS = [
+  { g: 'Round 2', id: 'rows', name: 'List rows', fb: 'The list looks cluttered.', note: 'Look at the tasks in Inbox.', scene: 'home', hl: '.row', opts: [
+    ['plain', 'Plain rows, hover only', 'No lines and no boxes. Hover shows a soft fill that bleeds 10 px, so the text does not move.'],
+    ['lines', 'Hairline between rows', 'A 1 px line under each row. No fill.'],
+    ['boxed', 'A box per row', 'Each row is a white box with a 6 px gap.'],
+  ] },
+  { id: 'title', name: 'Page title', note: 'Look at the top of Inbox.', scene: 'home', hl: '.hdr', opts: [
+    ['big', 'Big title with a count', '26 px title, the task count under it.'],
+    ['compact', 'Compact title, count beside it', '15 px title on one line with the count. More room for tasks.'],
+    ['tabs', 'Tabs, no title', 'Inbox, Today and Done as tabs. The sidebar already says where you are.'],
+  ] },
+  { id: 'toggle', name: 'Settings switches', fb: 'The switches look heavy.', note: 'Hover jumps to Settings and back.', scene: 'settings', hl: '.sw, .ck2, .seg2', opts: [
+    ['switch', 'Switch', 'The usual on and off switch.'],
+    ['check', 'Checkbox', 'A small square box. Lighter than a switch.'],
+    ['seg', 'On · Off', 'A small segmented control with both words.'],
+  ] },
+  { g: 'Round 1', id: 'accent', lock: true, name: 'Accent', opts: [
+    ['ink', 'Ink', 'Primary button and the selected sidebar item are black.'],
+    ['blue', 'Blue', 'Primary button and the selected sidebar item are blue.'],
+    ['green', 'Green', 'Primary button and the selected sidebar item are green.'],
+  ] },
+  { id: 'density', lock: true, name: 'Row height', opts: [
+    ['32', '32 px', 'Room for a pointer, calm.'],
+    ['28', '28 px', 'More tasks on screen.'],
+    ['40', '40 px', 'Touch size. Feels slow on a Mac.'],
+  ] },
+];
+
+// ================= demo data (invent all of it) =================
+function fresh() {
+  return { sel: null, sets: [true, false, true], items: [
+    ['Send the brief to the studio', 'Today'], ['Review the logo options', 'Today'], ['Book the train to Hamburg', 'Tomorrow'],
+    ['Pay the invoice from March', 'Fri'], ['Call the landlord about the heating', 'Next week'], ['Back up the photo library', 'Next week'],
+  ].map(([title, due], i) => ({ id: i + 1, title, due, done: false })) };
+}
+const SETS = [['Sync on mobile data', 'Uses data when you are not on Wi-Fi'], ['Show completed tasks', 'They stay in the list, struck through'], ['Sounds', 'A short sound when you complete a task']];
+
+// ================= the app =================
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+function deskClass() { return `acc-${C('accent')} rows-${C('rows')} t-${C('title')} d-${C('density')}`; }
+function app() {
+  const nav = SCENES.map(([id, n]) => `<button class="nav ${S.scene === id ? 'on' : ''}" data-go="${id}"><i class="ic"></i>${n}</button>`).join('');
+  let main = '';
+  if (S.scene === 'system') {
+    const cs = getComputedStyle(desk);
+    const card = (toks, sw) => `<div class="card">${toks.map(t => `<div class="tok">${sw ? `<i style="background:var(${t})"></i>` : ''}${t}<span>${cs.getPropertyValue(t).trim()}</span></div>`).join('')}</div>`;
+    main = `<div class="hdr"><div><h1>Design system</h1><div class="sub">Every value the app uses</div></div></div>${card(['--bg', '--side', '--card', '--hover', '--line', '--fg', '--fg2', '--fg3', '--a'], true)}${card(['--fs-title', '--fs-head', '--fs-ui', '--fs-small', '--rh', '--h-ctl', '--r-row', '--r-ctl', '--r-card'])}`;
+  } else if (S.scene === 'settings') {
+    const ctl = on => C('toggle') === 'check' ? `<span class="ck2 ${on ? 'on' : ''}">${on ? '✓' : ''}</span>` : C('toggle') === 'seg' ? `<span class="seg2"><span class="${on ? 'on' : ''}">On</span><span class="${on ? '' : 'on'}">Off</span></span>` : `<span class="sw ${on ? 'on' : ''}"></span>`;
+    main = `<div class="hdr"><div><h1>Settings</h1><div class="sub">Saved on this Mac</div></div></div>${SETS.map(([t, h], i) => `<button class="set" data-set="${i}"><span><span>${t}</span><span class="sub" style="display:block">${h}</span></span>${ctl(A.sets[i])}</button>`).join('')}`;
+  } else {
+    const open = A.items.filter(x => !x.done).length;
+    const head = C('title') === 'tabs'
+      ? `<div class="tabs"><span class="tab on" data-centred>Inbox</span><span class="tab" data-centred>Today</span><span class="tab" data-centred>Done</span></div>`
+      : `<div><h1>Inbox</h1><div class="sub">${open} open</div></div>`;
+    main = `<div class="hdr">${head}<button class="btn" data-a="add">New task</button></div>${A.items.map(it => `<button class="row ${it.done ? 'done' : ''}" data-open="${it.id}"><span class="ck"></span><span class="t">${esc(it.title)}</span><span class="dt">${esc(it.due)}</span></button>`).join('')}`;
+  }
+  return `<div class="side" data-area="sidebar"><div class="brand">Tasks</div>${nav}</div><div class="main" data-area="main">${main}</div>`;
+}
+function appClick(t) {
+  if (t.dataset.go) S.scene = t.dataset.go;
+  else if (t.dataset.open) { const it = A.items.find(x => x.id === +t.dataset.open); it.done = !it.done; }
+  else if (t.dataset.set) A.sets[+t.dataset.set] = !A.sets[+t.dataset.set];
+  else if (t.dataset.a === 'add') A.items.unshift({ id: Date.now(), title: 'New task', due: 'Today', done: false });
+  else return false;
+  return true;
+}
+
+// ================= picker machinery: keep =================
+const KEY = `designr-${PRODUCT}-${VERSION}`;
+let S = null;
+try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+S = S || { c: {}, scene: SCENES[0][0], hover: true };
+DECISIONS.forEach(d => { if (!(d.id in S.c)) S.c[d.id] = d.lock ? LOCKED[d.id] : d.opts[0][0]; });
+let A = fresh(), PV = null;
+const C = id => (S.before && id in BEFORE ? BEFORE[id] : S.c[id]);
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(PV ? { ...S, c: { ...S.c, [PV.id]: PV.orig } } : S)); } catch (e) {} };
+const desk = document.getElementById('desk'), picker = document.getElementById('picker');
+const shot = location.hash.includes('&shot');
+if (shot) document.body.classList.add('shot');
+
+function fit() {
+  const st = document.getElementById('stage').getBoundingClientRect();
+  const k = shot ? 1 : Math.min(st.width / DESK.w, st.height / DESK.h, 1);
+  desk.style.width = DESK.w + 'px'; desk.style.height = DESK.h + 'px';
+  desk.style.transform = `scale(${k})`;
+}
+// fade: the old frame stays on top and fades out in 140 ms (hover previews only).
+function render(fade) {
+  if (fade && !shot) {
+    const g = desk.cloneNode(true); g.removeAttribute('id'); g.classList.add('ghost'); g.querySelector('#guides')?.remove();
+    desk.after(g); requestAnimationFrame(() => requestAnimationFrame(() => { g.style.opacity = 0; })); setTimeout(() => g.remove(), 200);
+  }
+  desk.className = 'desk ' + deskClass();
+  desk.innerHTML = app();
+  markPreview(); audit(); drawGuides();
+}
+function preset(id) { S.scene = id; A.sel = null; save(); renderPicker(); }
+
+const optLabel = d => (d.opts.find(o => o[0] === C(d.id)) || [0, C(d.id)])[1];
+function renderPicker() {
+  const open = DECISIONS.filter(d => !d.lock), locked = DECISIONS.filter(d => d.lock);
+  const radios = d => d.opts.map(([v, l, help], i) => {
+    const tag = d.lock ? (LOCKED[d.id] === v ? '<span class="lk">locked</span>' : '') : i === 0 ? '<span class="rec">recommended</span>' : '';
+    return `<button class="pk-opt ${C(d.id) === v ? 'on' : ''}" data-d="${d.id}" data-v="${v}"><span class="r"></span>${esc(l)}<span class="end">${tag}${help ? `<span class="hq" data-help="${esc(help)}">?</span>` : ''}</span></button>`;
+  }).join('');
+  let h = `<h1>${PRODUCT} ${VERSION} · round ${ROUND}</h1><p class="lede">${open.length} open. Hover an option to see it. ? explains it.</p>${READ ? `<p class="read">${esc(READ)}</p>` : ''}`;
+  if (Object.keys(BEFORE).length) h += `<div class="pk-ba"><button class="pk-btn ${S.before ? 'on' : ''}" data-a="before">Before</button><button class="pk-btn ${S.before ? '' : 'on'}" data-a="after">After</button><span>B</span></div>`;
+  h += `<div class="pk-notes"><ul>${HOWTO.map(n => `<li>${n}</li>`).join('')}</ul></div>`;
+  h += `<h2>Jump to</h2><div class="pk-scenes">${SCENES.map(([id, n]) => `<button class="pk-btn ${S.scene === id ? 'on' : ''}" data-scene="${id}">${n}</button>`).join('')}</div>`;
+  h += `<button class="pk-tog ${S.hover !== false ? 'on' : ''}" data-a="hover"><i></i>Preview on hover</button><button class="pk-tog ${S.guides ? 'on' : ''}" data-a="guides"><i></i>Alignment guides (G)</button><button class="pk-tog ${S.agt !== false ? 'on' : ''}" data-a="agt"><i></i>Notes on elements (Agentation)</button><div class="pk-audit" id="agt-state">${esc(AGT_MSG)}</div><div class="pk-audit" id="audit"></div>`;
+  h += `<h2>Open</h2>${open.length ? '' : '<p class="lede">Nothing open.</p>'}`;
+  open.forEach(d => { h += `<div class="pk-dec"><b>${esc(d.name)}</b>${d.fb ? `<div class="pk-new">You said: <q>${esc(d.fb)}</q></div>` : ''}${d.note ? `<p>${esc(d.note)}</p>` : ''}${radios(d)}</div>`; });
+  h += `<h2>Locked (${locked.length})</h2>`;
+  if (!S.unlock) {
+    h += locked.map(d => `<div class="pk-lock"><b>${esc(d.name)}</b><span>${esc(optLabel(d))}${C(d.id) !== LOCKED[d.id] ? ' · changed' : ''}</span></div>`).join('');
+    if (locked.length) h += `<button class="pk-btn" style="margin-top:8px" data-a="unlock">Unlock to compare</button>`;
+  } else {
+    h += `<button class="pk-btn" data-a="unlock">Hide the locked options</button>`;
+    locked.forEach(d => { h += `${d.g ? `<h2>${esc(d.g)}</h2>` : ''}<div class="pk-dec"><b>${esc(d.name)}</b>${radios(d)}</div>`; });
+  }
+  h += `<div class="pk-foot"><button class="pk-btn" data-a="copy">Copy my picks</button><button class="pk-btn" data-a="reset">Back to locked picks</button><button class="pk-btn" data-a="demo">Reset demo data</button></div><textarea id="picks" readonly></textarea>`;
+  const top = picker.scrollTop; picker.innerHTML = h; picker.scrollTop = top;
+  document.getElementById('picks').value = picksText();
+  render();
+}
+function picksText() {
+  const line = d => `- ${d.name}: ${optLabel(d)}${d.lock ? (C(d.id) !== LOCKED[d.id] ? ' (changed from the locked pick)' : '') : C(d.id) === d.opts[0][0] ? '' : ' (not the recommendation)'}`;
+  const scene = id => (SCENES.find(x => x[0] === id) || [0, id])[1];
+  const notes = (S.notes || []).map(n => `- ${scene(n.scene)} · \`${n.path}\`${n.text ? ` ("${n.text}")` : ''}: ${n.comment}`).join('\n');
+  return `# ${PRODUCT} ${VERSION} round ${ROUND} picks\n## Open\n${DECISIONS.filter(d => !d.lock).map(line).join('\n') || '- Nothing open'}\n## Locked\n${DECISIONS.filter(d => d.lock).map(line).join('\n')}${notes ? `\n## Notes on elements\n${notes}` : ''}\n## Notes\n- `;
+}
+// Agentation state line in the picker. The module script at the end sets it.
+let AGT_MSG = '';
+function agtMsg(m) { AGT_MSG = m; const el = document.getElementById('agt-state'); if (el) el.textContent = m; }
+// Notes from Agentation (the module script at the end). They go into the picks text.
+const NOTES = {
+  set(a) { const old = (S.notes || []).find(n => n.id === a.id); S.notes = (S.notes || []).filter(n => n.id !== a.id).concat({ id: a.id, scene: old ? old.scene : S.scene, path: a.elementPath, text: NOTES.text(a), comment: a.comment }); NOTES.done(); },
+  text(a) { let el = null; try { el = document.querySelector(a.elementPath); } catch (e) {} while (el && el !== desk && !el.innerText.trim()) el = el.parentElement; return (a.selectedText || el?.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 60); },
+  del(a) { S.notes = (S.notes || []).filter(n => n.id !== a.id); NOTES.done(); },
+  clear() { S.notes = []; NOTES.done(); },
+  done() { save(); const p = document.getElementById('picks'); if (p) p.value = picksText(); },
+};
+// Hover preview: the option applies while hovered, its scene opens, and the hl elements glow once.
+// Leaving goes back to the pick and to the scene you were on. A click keeps the option and the scene.
+// Only the app renders again, never the picker, so the picker does not move.
+function previewOn(id, v) {
+  if (S.hover === false) return;
+  const d = DECISIONS.find(x => x.id === id); if (!d) return;
+  if (PV && PV.id !== id) previewOff(true);
+  if (!PV) PV = { id, orig: S.c[id], scene: S.scene };
+  if (PV.v === v) return;
+  PV.v = v; S.c[id] = v;
+  if (d.scene && S.scene !== d.scene) S.scene = d.scene;
+  render(true);
+}
+function previewOff(silent) { if (!PV) return; S.c[PV.id] = PV.orig; S.scene = PV.scene; PV = null; save(); if (!silent) render(true); }
+function markPreview() {
+  const d = PV && DECISIONS.find(x => x.id === PV.id);
+  if (d && d.hl) desk.querySelectorAll(d.hl).forEach(el => el.classList.add('pvhl'));
+}
+// Counter: text sizes, colours and weights in view.
+function audit() {
+  const box = document.getElementById('audit'); if (!box) return;
+  const sz = new Set(), co = new Set(), wt = new Set(), n = {};
+  for (const el of desk.querySelectorAll('*')) {
+    if (el.closest('#guides, [data-os]')) continue;
+    const own = [...el.childNodes].some(x => x.nodeType === 3 && x.textContent.trim()) || (el.matches('input, textarea') && el.value);
+    if (!own) continue;
+    const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue;
+    const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || +cs.opacity === 0) continue;
+    const f = parseFloat(cs.fontSize); sz.add(f); n[f] = (n[f] || 0) + 1; co.add(cs.color); wt.add(cs.fontWeight);
+  }
+  box.innerHTML = `In view: <b>${sz.size}</b> sizes · <b>${co.size}</b> text colours · <b>${wt.size}</b> weights<br>${[...sz].sort((a, b) => b - a).map(f => `${f} px ×${n[f]}`).join(' · ')}`;
+}
+// Alignment guides (G). Areas: [data-area]. Centred items: [data-centred] or .btn.
+// Green: a left edge that 3 or more items share. Blue: a shared right edge. Red: 1 to 5 px off a line.
+const CENTRED = '[data-centred], .btn';
+function drawGuides() {
+  desk.querySelector('#guides')?.remove(); window.__guides = null;
+  if (!S.guides) return;
+  const k = desk.getBoundingClientRect().width / DESK.w, dr = desk.getBoundingClientRect();
+  const X = x => (x - dr.left) / k, Y = y => (y - dr.top) / k;
+  let out = '', misses = [], cols = 0;
+  desk.querySelectorAll('[data-area]').forEach(area => {
+    const ar = area.getBoundingClientRect(), L = [], R = [];
+    const vis = r => r.width > 0 && r.height > 0 && r.bottom > ar.top && r.top < ar.bottom;
+    const push = (arr, x, r, what) => arr.push({ x: Math.round(X(x) * 2) / 2, t: Y(r.top), b: Y(r.bottom), l: X(r.left), w: r.width / k, what });
+    const tw = document.createTreeWalker(area, NodeFilter.SHOW_TEXT, { acceptNode: x => x.textContent.trim() ? 1 : 2 });
+    for (let t; (t = tw.nextNode());) {
+      const el = t.parentElement; if (!el || el.closest(CENTRED)) continue;
+      const cs = getComputedStyle(el); if (cs.textAlign === 'center' || cs.textAlign === 'right' || cs.marginLeft === 'auto') continue;
+      const rg = document.createRange(); rg.selectNodeContents(t); const r = rg.getClientRects()[0];
+      if (r && vis(r)) push(L, r.left, r, t.textContent.trim().slice(0, 24));
+    }
+    area.querySelectorAll('input, textarea').forEach(el => {
+      const r = el.getBoundingClientRect(); if (!vis(r) || el.closest(CENTRED)) return;
+      const cs = getComputedStyle(el); push(L, r.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth), r, (el.value || el.placeholder || '').slice(0, 24));
+    });
+    area.querySelectorAll('.ic, svg').forEach(el => {
+      const r = el.getBoundingClientRect(); if (!vis(r) || el.closest(CENTRED)) return;
+      if (!el.previousElementSibling) push(L, r.left, r, 'icon');
+      if (!el.nextElementSibling && !el.nextSibling?.textContent?.trim()) push(R, r.right, r, 'icon');
+    });
+    const group = arr => { const g = []; arr.sort((a, b) => a.x - b.x).forEach(e => { const last = g[g.length - 1]; if (last && e.x - last.x0 <= .75) last.items.push(e); else g.push({ x0: e.x, items: [e] }); }); g.forEach(c => { c.x = c.items.reduce((a, b) => a + b.x, 0) / c.items.length; }); return g; };
+    const lines = (arr, cls) => {
+      const g = group(arr), strong = g.filter(c => c.items.length >= 3);
+      strong.forEach(c => { cols++; out += `<div class="gv ${cls}" style="left:${c.x}px;top:${Y(ar.top)}px;height:${ar.height / k}px"><span>${Math.round(c.x - X(ar.left))}</span></div>`; });
+      g.filter(c => c.items.length < 3).forEach(c => {
+        const near = strong.find(s2 => Math.abs(s2.x - c.x) >= 1 && Math.abs(s2.x - c.x) <= 5); if (!near) return;
+        c.items.forEach(it => { const d = (it.x - near.x).toFixed(1); misses.push({ area: area.dataset.area, what: it.what, x: it.x, off: +d }); out += `<div class="bx" style="left:${it.l}px;top:${it.t}px;width:${Math.max(it.w, 2)}px;height:${it.b - it.t}px"><span>${d > 0 ? '+' : ''}${d}</span></div>`; });
+      });
+    };
+    lines(L, ''); lines(R, 'r');
+    out += `<div class="ol" style="left:${X(ar.left)}px;top:${Y(ar.top)}px;width:${ar.width / k}px;height:${ar.height / k}px"></div>`;
+  });
+  window.__guides = misses;
+  desk.insertAdjacentHTML('beforeend', `<div id="guides">${out}<div class="legend"><b>Alignment guides</b> · G to hide<br>green: shared left edge (3+) · blue: shared right edge<br>red: ${misses.length} item${misses.length === 1 ? '' : 's'} 1 to 5 px off a line · ${cols} lines</div></div>`);
+}
+
+picker.addEventListener('click', ev => {
+  const t = ev.target.closest('button'); if (!t) return;
+  const a = t.dataset.a;
+  if (t.dataset.scene) return preset(t.dataset.scene);
+  if (t.dataset.d) { clearTimeout(PT); PV = null; S.c[t.dataset.d] = t.dataset.v; S.before = false; }
+  else if (a === 'before' || a === 'after') S.before = a === 'before';
+  else if (a === 'hover') S.hover = S.hover === false;
+  else if (a === 'guides') S.guides = !S.guides;
+  else if (a === 'agt') { S.agt = S.agt === false; save(); window.AGT?.set(S.agt, true); }
+  else if (a === 'unlock') S.unlock = !S.unlock;
+  else if (a === 'copy') { navigator.clipboard?.writeText(picksText()); t.textContent = 'Copied'; return; }
+  else if (a === 'reset') { DECISIONS.forEach(d => { S.c[d.id] = d.lock ? LOCKED[d.id] : d.opts[0][0]; }); S.before = false; }
+  else if (a === 'demo') A = fresh();
+  else return;
+  save(); renderPicker();
+});
+// Hover intent: show an option after 90 ms. The gaps inside one decision keep the preview, so nothing flickers.
+let PT = null;
+picker.addEventListener('mouseover', ev => {
+  const o = ev.target.closest('.pk-opt[data-d]'), blk = ev.target.closest('.pk-dec');
+  clearTimeout(PT);
+  if (o) PT = setTimeout(() => previewOn(o.dataset.d, o.dataset.v), 90);
+  else if (PV && blk && blk.querySelector(`[data-d="${PV.id}"]`)) return;
+  else if (PV) PT = setTimeout(() => previewOff(), 140);
+});
+picker.addEventListener('mouseleave', () => { clearTimeout(PT); previewOff(); });
+desk.addEventListener('click', ev => { const t = ev.target.closest('button'); if (t && appClick(t)) { save(); renderPicker(); } });
+document.addEventListener('keydown', ev => {
+  if (ev.target.closest?.('input, textarea') || ev.metaKey || ev.ctrlKey) return;
+  if (ev.key === 'g' || ev.key === 'G') { S.guides = !S.guides; save(); renderPicker(); }
+  else if ((ev.key === 'b' || ev.key === 'B') && Object.keys(BEFORE).length) { S.before = !S.before; save(); renderPicker(); }
+});
+window.addEventListener('resize', () => { fit(); drawGuides(); });
+window.addEventListener('hashchange', () => { const id = location.hash.slice(1).split('&')[0]; if (id) preset(id); });
+fit();
+const scene0 = location.hash.slice(1).split('&')[0];
+if (scene0 && SCENES.some(s => s[0] === scene0)) preset(scene0); else renderPicker();
+document.fonts?.ready.then(() => { fit(); drawGuides(); });
+</script>
+<div id="agentation"></div>
+<script type="module">
+// Agentation (agentation.com): click any element, write a note. The picker toggle turns it on and off.
+// It loads from esm.sh, so it needs the network. The mockup works without it. Its notes go into "Copy my picks".
+const deps = '?deps=react@18.3.1,react-dom@18.3.1';
+let lib = null, root = null;
+async function set(on, open) {
+  if (!on) { root?.unmount(); root = null; agtMsg('Off.'); return; }
+  if (root) return;
+  agtMsg('Loading from esm.sh …');
+  try {
+    lib = lib || await Promise.all([import('https://esm.sh/react@18.3.1'), import('https://esm.sh/react-dom@18.3.1/client' + deps), import('https://esm.sh/agentation@3.1.2' + deps)]);
+    const [React, { createRoot }, { Agentation }] = lib;
+    root = createRoot(document.getElementById('agentation'));
+    root.render(React.createElement(Agentation, {
+      appName: `${PRODUCT} ${VERSION} round ${ROUND}`, className: 'agt-host',
+      identifyingAttributes: ['data-area', 'data-k', 'data-d', 'data-v', 'data-go', 'data-open'],
+      onAnnotationAdd: NOTES.set, onAnnotationUpdate: NOTES.set, onAnnotationDelete: NOTES.del, onAnnotationsClear: NOTES.clear,
+    }));
+    agtMsg('On. ⌘⇧F or the button at the bottom right of the app opens it. Then click an element and write.');
+    // After a click on the toggle, open the toolbar at once.
+    if (open) setTimeout(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'F', code: 'KeyF', metaKey: true, shiftKey: true, bubbles: true })), 250);
+  } catch (e) { root = null; agtMsg('Did not load (no network?). The mockup works without it.'); console.info('Agentation did not load.', e); }
+}
+window.AGT = { set };
+if (!shot) set(S.agt !== false); else agtMsg('');
+</script>
+</body>
+</html>

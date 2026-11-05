@@ -50,6 +50,9 @@ input { font: inherit; color: inherit; background: none; border: 0; outline: 0; 
 .pk-lock { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; padding: 3px 0; color: #8a8a92; }
 .pk-lock b { font-weight: 500; color: #c4c4cb; }
 .pk-foot { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 22px; }
+/* Agentation toolbar: bottom right of the app, not over the picker. */
+.agt-host { right: 396px !important; bottom: 16px !important; }
+#picker .read { color: #a6a6ae; font-size: 12px; margin: -6px 0 14px; padding-left: 10px; border-left: 2px solid #2a2a30; }
 #picks { margin-top: 10px; width: 100%; height: 150px; background: #141417; color: #bdbdc4; border: 1px solid #25252a; border-radius: 8px; padding: 8px; font: 11px/1.45 ui-monospace, Menlo, monospace; resize: vertical; }
 
 /* ---------- preview: crossfade, short glow, alignment guides ---------- */
@@ -99,7 +102,9 @@ input { font: inherit; color: inherit; background: none; border: 0; outline: 0; 
 const PRODUCT = 'Product', VERSION = 'v1', ROUND = 1;
 const DESK = { w: 1440, h: 900 };            // the real window size
 const SCENES = [['home', 'Home'], ['detail', 'Detail'], ['system', 'Design system']];
-const HOWTO = ['Everything is clickable.', 'Keys: G alignment guides, B before / after.', 'The scene buttons only jump to a starting state.', 'Notes on an element: ⌘⇧F (Agentation), click it, write. "Copy my picks" takes the notes.'];
+const HOWTO = ['Everything is clickable.', 'Keys: G alignment guides, B before / after.', 'The scene buttons only jump to a starting state.', 'Notes on one element: turn on Agentation below, click the element, write. "Copy my picks" takes the notes.'];
+// The design read and dials from tasteskill (design-taste-frontend). Empty hides it.
+const READ = '';
 // The picks the user locked. Each round adds the new locks here and in DECISIONS.md.
 const LOCKED = { accent: 'ink' };
 // Values for the Before switch (B): the last round, before the change you show.
@@ -189,11 +194,11 @@ function renderPicker() {
     const tag = d.lock ? (LOCKED[d.id] === v ? '<span class="lk">locked</span>' : '') : i === 0 ? '<span class="rec">recommended</span>' : '';
     return `<button class="pk-opt ${C(d.id) === v ? 'on' : ''}" data-d="${d.id}" data-v="${v}"><span class="r"></span>${esc(l)}<span class="end">${tag}${help ? `<span class="hq" data-help="${esc(help)}">?</span>` : ''}</span></button>`;
   }).join('');
-  let h = `<h1>${PRODUCT} ${VERSION} · round ${ROUND}</h1><p class="lede">${open.length} open. Hover an option to see it. ? explains it.</p>`;
+  let h = `<h1>${PRODUCT} ${VERSION} · round ${ROUND}</h1><p class="lede">${open.length} open. Hover an option to see it. ? explains it.</p>${READ ? `<p class="read">${esc(READ)}</p>` : ''}`;
   if (Object.keys(BEFORE).length) h += `<div class="pk-ba"><button class="pk-btn ${S.before ? 'on' : ''}" data-a="before">Before</button><button class="pk-btn ${S.before ? '' : 'on'}" data-a="after">After</button><span>B</span></div>`;
   h += `<div class="pk-notes"><ul>${HOWTO.map(n => `<li>${n}</li>`).join('')}</ul></div>`;
   h += `<h2>Jump to</h2><div class="pk-scenes">${SCENES.map(([id, n]) => `<button class="pk-btn ${S.scene === id ? 'on' : ''}" data-scene="${id}">${n}</button>`).join('')}</div>`;
-  h += `<button class="pk-tog ${S.hover !== false ? 'on' : ''}" data-a="hover"><i></i>Preview on hover</button><button class="pk-tog ${S.guides ? 'on' : ''}" data-a="guides"><i></i>Alignment guides (G)</button><div class="pk-audit" id="audit"></div>`;
+  h += `<button class="pk-tog ${S.hover !== false ? 'on' : ''}" data-a="hover"><i></i>Preview on hover</button><button class="pk-tog ${S.guides ? 'on' : ''}" data-a="guides"><i></i>Alignment guides (G)</button><button class="pk-tog ${S.agt !== false ? 'on' : ''}" data-a="agt"><i></i>Notes on elements (Agentation)</button><div class="pk-audit" id="agt-state">${esc(AGT_MSG)}</div><div class="pk-audit" id="audit"></div>`;
   h += `<h2>Open</h2>${open.length ? '' : '<p class="lede">Nothing open.</p>'}`;
   open.forEach(d => { h += `<div class="pk-dec"><b>${esc(d.name)}</b>${d.fb ? `<div class="pk-new">You said: <q>${esc(d.fb)}</q></div>` : ''}${d.note ? `<p>${esc(d.note)}</p>` : ''}${radios(d)}</div>`; });
   h += `<h2>Locked (${locked.length})</h2>`;
@@ -215,27 +220,31 @@ function picksText() {
   const notes = (S.notes || []).map(n => `- ${scene(n.scene)} · \`${n.path}\`${n.text ? ` ("${n.text}")` : ''}: ${n.comment}`).join('\n');
   return `# ${PRODUCT} ${VERSION} round ${ROUND} picks\n## Open\n${DECISIONS.filter(d => !d.lock).map(line).join('\n') || '- Nothing open'}\n## Locked\n${DECISIONS.filter(d => d.lock).map(line).join('\n')}${notes ? `\n## Notes on elements\n${notes}` : ''}\n## Notes\n- `;
 }
+// Agentation state line in the picker. The module script at the end sets it.
+let AGT_MSG = '';
+function agtMsg(m) { AGT_MSG = m; const el = document.getElementById('agt-state'); if (el) el.textContent = m; }
 // Notes from Agentation (the module script at the end). They go into the picks text.
 const NOTES = {
   set(a) { const old = (S.notes || []).find(n => n.id === a.id); S.notes = (S.notes || []).filter(n => n.id !== a.id).concat({ id: a.id, scene: old ? old.scene : S.scene, path: a.elementPath, text: NOTES.text(a), comment: a.comment }); NOTES.done(); },
-  text(a) { let el = null; try { el = document.querySelector(a.elementPath); } catch (e) {} return (a.selectedText || el?.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 60); },
+  text(a) { let el = null; try { el = document.querySelector(a.elementPath); } catch (e) {} while (el && el !== desk && !el.innerText.trim()) el = el.parentElement; return (a.selectedText || el?.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 60); },
   del(a) { S.notes = (S.notes || []).filter(n => n.id !== a.id); NOTES.done(); },
   clear() { S.notes = []; NOTES.done(); },
   done() { save(); const p = document.getElementById('picks'); if (p) p.value = picksText(); },
 };
 // Hover preview: the option applies while hovered, its scene opens, and the hl elements glow once.
+// Leaving goes back to the pick and to the scene you were on. A click keeps the option and the scene.
 // Only the app renders again, never the picker, so the picker does not move.
 function previewOn(id, v) {
   if (S.hover === false) return;
   const d = DECISIONS.find(x => x.id === id); if (!d) return;
   if (PV && PV.id !== id) previewOff(true);
-  if (!PV) PV = { id, orig: S.c[id] };
+  if (!PV) PV = { id, orig: S.c[id], scene: S.scene };
   if (PV.v === v) return;
   PV.v = v; S.c[id] = v;
   if (d.scene && S.scene !== d.scene) S.scene = d.scene;
   render(true);
 }
-function previewOff(silent) { if (!PV) return; S.c[PV.id] = PV.orig; PV = null; save(); if (!silent) render(true); }
+function previewOff(silent) { if (!PV) return; S.c[PV.id] = PV.orig; S.scene = PV.scene; PV = null; save(); if (!silent) render(true); }
 function markPreview() {
   const d = PV && DECISIONS.find(x => x.id === PV.id);
   if (d && d.hl) desk.querySelectorAll(d.hl).forEach(el => el.classList.add('pvhl'));
@@ -307,6 +316,7 @@ picker.addEventListener('click', ev => {
   else if (a === 'before' || a === 'after') S.before = a === 'before';
   else if (a === 'hover') S.hover = S.hover === false;
   else if (a === 'guides') S.guides = !S.guides;
+  else if (a === 'agt') { S.agt = S.agt === false; save(); window.AGT?.set(S.agt, true); }
   else if (a === 'unlock') S.unlock = !S.unlock;
   else if (a === 'copy') { navigator.clipboard?.writeText(picksText()); t.textContent = 'Copied'; return; }
   else if (a === 'reset') { DECISIONS.forEach(d => { S.c[d.id] = d.lock ? LOCKED[d.id] : d.opts[0][0]; }); S.before = false; }
@@ -326,7 +336,7 @@ picker.addEventListener('mouseover', ev => {
 picker.addEventListener('mouseleave', () => { clearTimeout(PT); previewOff(); });
 desk.addEventListener('click', ev => { const t = ev.target.closest('button'); if (t && appClick(t)) { save(); renderPicker(); } });
 document.addEventListener('keydown', ev => {
-  if (ev.target.closest('input, textarea') || ev.metaKey || ev.ctrlKey) return;
+  if (ev.target.closest?.('input, textarea') || ev.metaKey || ev.ctrlKey) return;
   if (ev.key === 'g' || ev.key === 'G') { S.guides = !S.guides; save(); renderPicker(); }
   else if ((ev.key === 'b' || ev.key === 'B') && Object.keys(BEFORE).length) { S.before = !S.before; save(); renderPicker(); }
 });
@@ -339,20 +349,30 @@ document.fonts?.ready.then(() => { fit(); drawGuides(); });
 </script>
 <div id="agentation"></div>
 <script type="module">
-// Agentation (agentation.com): ⌘⇧F, click any element, write a note. It loads from esm.sh, so it needs the network.
-// The mockup works without it. Its notes go into "Copy my picks" through NOTES.
-if (!shot) {
-  const deps = '?deps=react@18.3.1,react-dom@18.3.1';
+// Agentation (agentation.com): click any element, write a note. The picker toggle turns it on and off.
+// It loads from esm.sh, so it needs the network. The mockup works without it. Its notes go into "Copy my picks".
+const deps = '?deps=react@18.3.1,react-dom@18.3.1';
+let lib = null, root = null;
+async function set(on, open) {
+  if (!on) { root?.unmount(); root = null; agtMsg('Off.'); return; }
+  if (root) return;
+  agtMsg('Loading from esm.sh …');
   try {
-    const [React, { createRoot }, { Agentation }] = await Promise.all([
-      import('https://esm.sh/react@18.3.1'), import('https://esm.sh/react-dom@18.3.1/client' + deps), import('https://esm.sh/agentation@3.1.2' + deps)]);
-    createRoot(document.getElementById('agentation')).render(React.createElement(Agentation, {
-      appName: `${PRODUCT} ${VERSION} round ${ROUND}`,
-      identifyingAttributes: ['data-area', 'data-d', 'data-v', 'data-go', 'data-open'],
+    lib = lib || await Promise.all([import('https://esm.sh/react@18.3.1'), import('https://esm.sh/react-dom@18.3.1/client' + deps), import('https://esm.sh/agentation@3.1.2' + deps)]);
+    const [React, { createRoot }, { Agentation }] = lib;
+    root = createRoot(document.getElementById('agentation'));
+    root.render(React.createElement(Agentation, {
+      appName: `${PRODUCT} ${VERSION} round ${ROUND}`, className: 'agt-host',
+      identifyingAttributes: ['data-area', 'data-k', 'data-d', 'data-v', 'data-go', 'data-open'],
       onAnnotationAdd: NOTES.set, onAnnotationUpdate: NOTES.set, onAnnotationDelete: NOTES.del, onAnnotationsClear: NOTES.clear,
     }));
-  } catch (e) { console.info('Agentation did not load. The mockup works without it.', e); }
+    agtMsg('On. ⌘⇧F or the button at the bottom right of the app opens it. Then click an element and write.');
+    // After a click on the toggle, open the toolbar at once.
+    if (open) setTimeout(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'F', code: 'KeyF', metaKey: true, shiftKey: true, bubbles: true })), 250);
+  } catch (e) { root = null; agtMsg('Did not load (no network?). The mockup works without it.'); console.info('Agentation did not load.', e); }
 }
+window.AGT = { set };
+if (!shot) set(S.agt !== false); else agtMsg('');
 </script>
 </body>
 </html>

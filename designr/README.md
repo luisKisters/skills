@@ -4,6 +4,8 @@ Designr is a design workflow for agents. You design UI in rounds, in one interac
 
 It triggers when you ask an agent to design or redesign an app, screen or style, to show options or variants, to lock a design, to clean up a cluttered UI, to make a design system from a design, or to build or check UI against a locked design.
 
+When tasteskill (`design-taste-frontend`, tasteskill v2) is installed, designr loads it for the design read, the dials and the rules for each option. The user's picks and the locked design system win over it.
+
 It ships a starter mockup (`templates/mockup.html`), a decision log template, design system templates, and the Calendr design system as a filled example.
 
 ## Install

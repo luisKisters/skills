@@ -1,6 +1,6 @@
 ---
 name: designr
-description: Use when the user wants to design or redesign UI with an agent - a new app, screen, flow, component or visual style - or says "make it look better", "show me options", "mockup", "variants", "design round", "lock this", "too cluttered", "too many fonts or colours", or wants a design system made from a design, or wants UI built or checked against a locked design. Works for any stack (SwiftUI, web, other). The workflow - one interactive HTML mockup with a picker, rounds of user picks and feedback, a decision log, a clean-up into a design system, an alignment check, then hand-off and a pixel compare against the real app.
+description: Use when the user wants to design or redesign UI with an agent - a new app, screen, flow, component or visual style - or says "make it look better", "show me options", "mockup", "variants", "design round", "lock this", "too cluttered", "too many fonts or colours", or wants a design system made from a design, or wants UI built or checked against a locked design. Works for any stack (SwiftUI, web, other). Uses tasteskill (design-taste-frontend) for the visual direction when it is installed. The workflow - one interactive HTML mockup with a picker, rounds of user picks and feedback, a decision log, a clean-up into a design system, an alignment check, then hand-off and a pixel compare against the real app.
 ---
 
 # Designr
@@ -19,11 +19,13 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
 1. Brief
     - Read the current UI, its theme code and earlier mockups or design docs. Take screenshots of the current app.
     - Ask only what changes the work: platform, window size, the screens, references the user likes.
+    - Load tasteskill (skill `design-taste-frontend`, tasteskill v2). Write its one-line design read and the three dials. Put them in `READ` in the mockup. If it is not installed, give the install command once and go on: `npx skills add https://github.com/Leonxlnx/taste-skill --skill design-taste-frontend`.
     - Make a list of decisions: each element that has more than one good answer.
 2. Mockup (rules: [references/mockup.md](references/mockup.md), start file: [templates/mockup.html](templates/mockup.html))
     - One self-contained HTML file: `design/mockup-vN/index.html`. The real app at real size on the left, the picker on the right.
     - Every option works in the mockup. A description is not an option.
     - Give 2 to 5 options per decision. The first option is your recommendation.
+    - Make each option with tasteskill's rules: its dials, no generic defaults, its type and colour rules. For app UI (a Mac app, a dashboard, a tool), use only its general rules; skip its website rules (photographs, one section per screen, hero, scroll effects).
     - Tell the user how to open it (`open design/mockup-vN/index.html`) and what to look at.
 3. Round
     - The user clicks through, picks, and pastes the "Copy my picks" text with notes. Notes on one element come from Agentation (⌘⇧F in the mockup) with a CSS path.
@@ -43,12 +45,14 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
     - Write the design system files: `design-system/README.md`, `foundations.md`, `components.md`. Take values from the mockup CSS and `DECISIONS.md` only.
     - Map each token to the code (theme file, colour, font, padding). Name the files to change.
     - Build from tokens only. If a value is missing, ask. Do not invent it.
+    - Use tasteskill only where the design system has no answer.
 7. Verify (details: [references/verify.md](references/verify.md))
     - Render each mockup scene and the same app state with the same demo data. Compare them side by side.
     - Run the project checks in `design-system/README.md`.
 
 ## Rules
 - The mockup wins. If a text and the mockup disagree, the mockup is right.
+- Order of authority: the user's picks, the locked mockup, the design system, tasteskill, framework defaults.
 - A locked pick stays locked. Reopen it only when the user asks. Keep old options behind "Unlock to compare".
 - Each round changes only what the feedback names. Do not redesign locked parts.
 - Name a decision by what the user sees ("Events I have not accepted"), not by code.
@@ -69,6 +73,8 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
 - [ ] Every open decision has 2 to 5 working options, a quote of the feedback and a scene.
 - [ ] Hover on an option shows it after a short pause, with no flicker in the gaps, and what changes glows once.
 - [ ] Every option has a "?" text that says what it does.
+- [ ] `READ` has the tasteskill design read and dials.
+- [ ] The Agentation toggle says "On" (or why it did not load).
 - [ ] `LOCKED` and `DECISIONS.md` agree.
 - [ ] G shows no red box in the scenes you changed.
 - [ ] The file opens from disk with no server and no console error.

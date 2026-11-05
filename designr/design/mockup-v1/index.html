@@ -553,7 +553,7 @@ function picksText() {
 // Notes from Agentation (the module script at the end). They go into the picks text.
 const NOTES = {
   set(a) { const old = (S.notes || []).find(n => n.id === a.id); S.notes = (S.notes || []).filter(n => n.id !== a.id).concat({ id: a.id, scene: old ? old.scene : S.scene, path: a.elementPath, text: NOTES.text(a), comment: a.comment }); NOTES.done(); },
-  text(a) { let el = null; try { el = document.querySelector(a.elementPath); } catch (e) {} return (a.selectedText || el?.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 60); },
+  text(a) { let el = null; try { el = document.querySelector(a.elementPath); } catch (e) {} while (el && el !== desk && !el.innerText.trim()) el = el.parentElement; return (a.selectedText || el?.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 60); },
   del(a) { S.notes = (S.notes || []).filter(n => n.id !== a.id); NOTES.done(); },
   clear() { S.notes = []; NOTES.done(); },
   done() { save(); const p = document.getElementById('picks'); if (p) p.value = picksText(); },
