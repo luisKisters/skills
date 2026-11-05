@@ -42,6 +42,10 @@ This repository is my personal collection of agent skills. Each skill packages f
 
 `satire-supercut` makes a short, clearly labeled parody video (a YTP or sentence-mix supercut) in which a creator "says" a new script built only from their real words. An agent should trigger it when a user asks for a YTP, YouTube Poop, supercut, sentence-mix, or "make <creator> say <thing>" edit. It indexes auto-captions, downloads only the needed clip sections, finds clean cut points with ASR word timings and an audio energy profile, burns in captions and a `parody` tag, and verifies the final cut by transcribing it. It is for satire only: jokes must be obviously absurd and every frame is labeled. Install it with `npx skills add github.com/luisKisters/skills --skill satire-supercut`.
 
+## designr
+
+`designr` is a design workflow for agents: UI is designed in rounds in one interactive HTML mockup, with the real app at real size and a picker beside it. The agent builds 2 to 5 working options per decision, the user previews them on hover, picks and pastes notes back, and the agent locks the picks in a decision log. It then cleans the result up into a design system, checks alignment with built-in guides, and hands off design system files, a token-to-code map and a pixel compare of the app against the mockup. An agent should trigger it when asked to design or redesign an app, screen or style, show variants, lock a design, clean up a cluttered UI, make a design system, or build or check UI against a locked design. It uses tasteskill (`design-taste-frontend`) for the visual direction when installed, adds Agentation for notes on single elements, works for any stack, and ships a starter mockup, templates and a filled Calendr example. Install it with `npx skills add github.com/luisKisters/skills --skill designr`.
+
 ## How to install a skill
 
 Install one skill with `npx skills add <repo> --skill <name>`. For this repository, replace `<repo>` with `github.com/luisKisters/skills` and `<name>` with the skill name shown above.
