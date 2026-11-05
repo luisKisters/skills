@@ -21,5 +21,6 @@ Round 3:
 - Leaving a hover preview that jumped to another scene now goes back to the scene you were on.
 - In mockup-v1 the Agentation button sat on the picks text at the bottom right. Nobody could find it.
 - A keydown handler failed on events sent to `document`. It now checks the target.
+- "ich will nich das der weiße space da is so": the app now grows to fill the stage, with no empty space under it or beside it. Shots keep the exact window size.
 ## Alignment check
 G in Inbox, Settings and Design system: 0 red boxes (`window.__guides` is empty in all three).

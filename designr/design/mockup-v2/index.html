@@ -219,8 +219,10 @@ if (shot) document.body.classList.add('shot');
 
 function fit() {
   const st = document.getElementById('stage').getBoundingClientRect();
+  // Scale so the real window fits, then grow the app to fill the stage: no empty space.
+  // Shots (#scene&shot) keep the exact DESK size.
   const k = shot ? 1 : Math.min(st.width / DESK.w, st.height / DESK.h, 1);
-  desk.style.width = DESK.w + 'px'; desk.style.height = DESK.h + 'px';
+  desk.style.width = (shot ? DESK.w : st.width / k) + 'px'; desk.style.height = (shot ? DESK.h : st.height / k) + 'px';
   desk.style.transform = `scale(${k})`;
 }
 // fade: the old frame stays on top and fades out in 140 ms (hover previews only).
@@ -317,7 +319,7 @@ const CENTRED = '[data-centred], .btn';
 function drawGuides() {
   desk.querySelector('#guides')?.remove(); window.__guides = null;
   if (!S.guides) return;
-  const k = desk.getBoundingClientRect().width / DESK.w, dr = desk.getBoundingClientRect();
+  const k = desk.getBoundingClientRect().width / desk.offsetWidth, dr = desk.getBoundingClientRect();
   const X = x => (x - dr.left) / k, Y = y => (y - dr.top) / k;
   let out = '', misses = [], cols = 0;
   desk.querySelectorAll('[data-area]').forEach(area => {

@@ -8,7 +8,7 @@ One HTML file per design version: `design/mockup-vN/index.html`. Start from [../
 - `#scene` in the URL opens a scene. `#scene&shot` hides the picker at scale 1, for screenshot scripts.
 
 ## The app part (left)
-- The real window at real size (`DESK`), scaled to fit. For a Mac app, add the macOS menu bar if the app uses it. Mark OS chrome with `data-os`, so the counter skips it.
+- The real window at real size (`DESK`), scaled to fit. The app then grows to fill the stage, so there is no empty space. Shots keep the exact `DESK` size. For a Mac app, add the macOS menu bar if the app uses it. Mark OS chrome with `data-os`, so the counter skips it.
 - It works like the app: clicks, menus, fields, keys, empty states. The user tests the flow, not a picture.
 - Demo data is invented and realistic: real-length names, long titles, busy days, edge cases.
 - Each scene is a start state that shows one problem. Name it by what the user sees ("Busy evening", "Delete with guests").
