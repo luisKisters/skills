@@ -1,0 +1,99 @@
+{
+ "title": "Ficha de trabajo 3",
+ "heading": "Ficha de trabajo 3 – Los garífunas: ¿Cómo viven?",
+ "storageId": "example-ficha3",
+ "lang": "es",
+ "sections": [
+  {
+   "label": "Ficha de trabajo 3",
+   "blocks": [
+    {
+     "type": "h",
+     "text": "Los~garífunas:/Die_Garífuna: ¿Cómo/Wie viven?/leben_sie?"
+    },
+    {
+     "type": "h",
+     "text": "1./1. Lee/Lies el~siguiente~texto/den_folgenden_Text"
+    },
+    {
+     "type": "h",
+     "text": "¿Cómo/Wie viven/leben los~garífunas?/die_Garífuna?"
+    },
+    {
+     "type": "p",
+     "text": "Tradicionalmente,/Traditionell muchas/viele familias/Familien garífunas/der_Garífuna vivían/lebten de~la~pesca,/vom_Fischfang, la~agricultura/von_der_Landwirtschaft y~el~comercio./und_vom_Handel. El~mar/Das_Meer siempre/immer ha~tenido/hat_gehabt una~gran/eine_große importancia/Bedeutung para/für sus/ihre comunidades./Gemeinden. Todavía~hoy,/Noch_heute algunas/einige familias/Familien trabajan/arbeiten como/als pescadores/Fischer o/oder agricultores./Bauern.",
+     "sentences": [
+      "Traditionell lebten viele Garífuna-Familien vom Fischfang, von der Landwirtschaft und vom Handel.",
+      "Das Meer hatte für ihre Gemeinden schon immer eine große Bedeutung.",
+      "Noch heute arbeiten einige Familien als Fischer oder Bauern."
+     ]
+    },
+    {
+     "type": "p",
+     "text": "Sin~embargo,/Jedoch no~todos/nicht_alle los~garífunas/Garífuna viven/leben de~estas/von_diesen actividades./Tätigkeiten. Hoy~en~día,/Heutzutage también/auch trabajan/arbeiten_sie en~escuelas,/in_Schulen, hospitales,/Krankenhäusern, empresas,/Firmen, restaurantes/Restaurants y~en~el/und_im sector~turístico./Tourismusbereich. Muchos/Viele jóvenes/junge_Leute estudian/studieren en~universidades/an_Universitäten y/und buscan/suchen nuevas/neue oportunidades~profesionales./berufliche_Chancen.",
+     "sentences": [
+      "Jedoch leben nicht alle Garífuna von diesen Tätigkeiten.",
+      "Heutzutage arbeiten sie auch in Schulen, Krankenhäusern, Firmen, Restaurants und im Tourismus.",
+      "Viele junge Leute studieren an Universitäten und suchen neue berufliche Chancen."
+     ]
+    },
+    {
+     "type": "p",
+     "text": "La~comida/Das_Essen es/ist una~parte/ein_Teil importante/wichtiger de~su~cultura./ihrer_Kultur. Utilizan/Sie_verwenden productos/Produkte como/wie el~pescado,/Fisch, el~coco,/Kokosnuss, la~yuca/Maniok y/und el~plátano./Kochbanane. Uno~de~sus/Eines_ihrer platos/Gerichte tradicionales/traditionellen más~conocidos/bekanntesten es/ist el~hudut,/das_Hudut, que~se~prepara/das_zubereitet_wird con/mit pescado,/Fisch, leche~de~coco/Kokosmilch y/und plátano./Kochbanane.",
+     "sentences": [
+      "Das Essen ist ein wichtiger Teil ihrer Kultur.",
+      "Sie verwenden Produkte wie Fisch, Kokosnuss, Maniok und Kochbanane.",
+      "Eines ihrer bekanntesten traditionellen Gerichte ist das Hudut, das mit Fisch, Kokosmilch und Kochbanane zubereitet wird."
+     ]
+    },
+    {
+     "type": "p",
+     "text": "La~música/Die_Musik y~el~baile/und_der_Tanz también/auch son/sind muy/sehr importantes./wichtig. Los~garífunas/Die_Garífuna utilizan/verwenden tambores/Trommeln tradicionales/traditionelle y/und tienen/haben diferentes/verschiedene estilos~musicales./Musikstile. Uno~de~los~más~famosos/Einer_der_berühmtesten es/ist la~punta,/die_Punta, un~baile/ein_Tanz, que~se~practica/der_getanzt_wird durante/bei fiestas/Festen y/und celebraciones./Feiern.",
+     "sentences": [
+      "Auch Musik und Tanz sind sehr wichtig.",
+      "Die Garífuna verwenden traditionelle Trommeln und haben verschiedene Musikstile.",
+      "Einer der berühmtesten ist die Punta, ein Tanz, der bei Festen und Feiern getanzt wird."
+     ]
+    },
+    {
+     "type": "p",
+     "text": "Además,/Außerdem tienen/haben_sie su~propia/ihre_eigene lengua,/Sprache, el~garífuna./das_Garífuna. Aunque/Obwohl muchas~personas/viele_Menschen hablan/sprechen también/auch español/Spanisch o/oder inglés,/Englisch, la~lengua~garífuna/die_Garífuna-Sprache sigue~siendo/ist_weiterhin una~parte/ein_Teil fundamental/grundlegender de~su~identidad./ihrer_Identität.",
+     "sentences": [
+      "Außerdem haben sie ihre eigene Sprache, das Garífuna.",
+      "Obwohl viele Menschen auch Spanisch oder Englisch sprechen, ist die Garífuna-Sprache weiterhin ein grundlegender Teil ihrer Identität."
+     ]
+    },
+    {
+     "type": "p",
+     "text": "En~2001,/Im_Jahr_2001 la~UNESCO/die_UNESCO reconoció/erkannte_an la~importancia/die_Bedeutung de~la~lengua,/der_Sprache, la~música/der_Musik y~los~bailes/und_der_Tänze garífunas/der_Garífuna como/als patrimonio~cultural/Kulturerbe de~la~humanidad./der_Menschheit.",
+     "sentences": [
+      "Im Jahr 2001 erkannte die UNESCO die Bedeutung der Sprache, der Musik und der Tänze der Garífuna als Kulturerbe der Menschheit an."
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Comprensión del texto",
+   "blocks": [
+    {
+     "type": "h",
+     "text": "2./2. Comprensión/Verständnis del~texto/des_Textes"
+    },
+    {
+     "type": "p",
+     "text": "1./1. ¿Cuáles/Welche eran/waren las~principales/die_wichtigsten actividades~económicas/wirtschaftlichen_Tätigkeiten tradicionales/traditionellen de~los~garífunas?/der_Garífuna?",
+     "sentences": [
+      "Was waren die wichtigsten traditionellen wirtschaftlichen Tätigkeiten der Garífuna?"
+     ]
+    },
+    {
+     "type": "p",
+     "text": "2./2. ¿En~qué/In_welchen sectores/Bereichen trabajan/arbeiten los~garífunas/die_Garífuna actualmente?/heute?",
+     "sentences": [
+      "In welchen Bereichen arbeiten die Garífuna heute?"
+     ]
+    }
+   ]
+  }
+ ]
+}

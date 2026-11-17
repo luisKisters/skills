@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="__LANG__">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<script type="application/json" id="progress">__PROGRESS__</script>
+<style>
+:root{--bg:#faf8f3;--fg:#1f1d1a;--tr:#b4532a;--muted:#8a847a;--card:#fff;--line:#e6e1d6;--ok:#3f7d4e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1917;--fg:#ece8df;--tr:#e9a074;--muted:#8f897e;--card:#23221f;--line:#38352f;--ok:#7fc08f}}
+:root[data-theme="dark"]{--bg:#1a1917;--fg:#ece8df;--tr:#e9a074;--muted:#8f897e;--card:#23221f;--line:#38352f;--ok:#7fc08f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:20px/1 Georgia,"Times New Roman",serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 80px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-size:22px;margin:0;font-weight:600;line-height:1.3}
+button{font:14px system-ui,sans-serif;padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;cursor:pointer}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:20px}
+h2{font-size:22px;margin:18px 0 6px;line-height:2.4}
+h2:first-of-type{margin-top:0}
+p{line-height:2.7;margin:0 0 14px}
+ruby{ruby-position:over;margin-right:.28em}
+rt{font:italic 12.5px/1.1 system-ui,sans-serif;color:var(--tr);letter-spacing:.01em}
+ruby.w{cursor:pointer;border-radius:4px;transition:background .15s}
+ruby.w:hover{background:color-mix(in srgb,var(--tr) 12%,transparent)}
+ruby.w rt{visibility:hidden}
+ruby.w.shown rt{visibility:visible}
+ruby.w.shown{background:color-mix(in srgb,var(--tr) 8%,transparent)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:14px system-ui,sans-serif;color:var(--muted)}
+#saveState{font:13px system-ui,sans-serif;color:var(--muted);margin:-12px 0 20px}
+#saveState.ok{color:var(--ok)}
+#log{font:14px/1.6 system-ui,sans-serif}
+#log ol{margin:8px 0 0;padding-left:22px;columns:2;column-gap:24px}
+#log li{break-inside:avoid}
+#log b{font-weight:600;color:var(--fg)}
+#log span{color:var(--tr)}
+@media (max-width:560px){#log ol{columns:1}}
+button.sb{font:600 10px system-ui,sans-serif;padding:2px 6px;vertical-align:middle;color:var(--tr);border-color:color-mix(in srgb,var(--tr) 40%,transparent);border-radius:5px;margin-right:.3em}
+button.sb.done{opacity:.35}
+.st{display:none}
+.st.shown{display:block;font:15px/1.5 system-ui,sans-serif;color:var(--tr);border-left:3px solid var(--tr);padding:4px 10px;margin:2px 0 10px}
+.page{font:12px system-ui,sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1 id="heading"></h1>
+  <div class="bar"><span id="count"></span><button id="saveBtn"></button><button id="reset"></button></div>
+</header>
+<div id="saveState"></div>
+<div id="out"></div>
+<section id="log"><div class="page" id="logTitle"></div><div id="logEmpty"></div><ol id="logList"></ol></section>
+</main>
+<script>
+// Snapshot of this file before rendering, used to write progress back into it.
+const SOURCE = "<!doctype html>\n" + document.documentElement.outerHTML;
+
+const DATA = __DATA__;
+
+const L = Object.assign({
+  count: (w,W,s,S) => `${w} / ${W} Wörter · ${s} / ${S} Sätze`,
+  reset: "Zurücksetzen",
+  resetConfirm: "Alle aufgedeckten Wörter und Sätze wieder verstecken und Log löschen?",
+  logTitle: "Aufgedeckte Wörter",
+  logEmpty: "Noch keine – klick auf ein Wort.",
+  sentence: "Ganzen Satz übersetzen",
+  link: "In Datei speichern",
+  download: "Mit Fortschritt herunterladen",
+  linked: n => `✓ Fortschritt wird automatisch in „${n}“ gespeichert.`,
+  relink: n => `Klick irgendwo, um das Speichern in „${n}“ wieder zu erlauben.`,
+  browserOnly: "Fortschritt ist nur in diesem Browser gespeichert. „In Datei speichern“ schreibt ihn in die HTML-Datei selbst.",
+  downloadHint: "Fortschritt ist in diesem Browser gespeichert. „Mit Fortschritt herunterladen“ und die alte Datei ersetzen, um ihn mitzunehmen.",
+  saveError: "Speichern in die Datei fehlgeschlagen – Fortschritt bleibt im Browser.",
+}, DATA.ui || {});
+
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const clean = s => s.replace(/[.,:;!?¿¡]+$/,"").replace(/^[¿¡]+/,"");
+
+// ---------- render ----------
+// Token format: source/target  ("~" = space inside a source chunk, "_" = space in the gloss)
+// Stable keys (text + occurrence) keep progress valid when the file is moved or other text is edited.
+const words = [], sentences = [], seen = {};
+const keyFor = (kind, a, b) => { const base = `${kind}|${a}|${b}`; seen[base] = (seen[base]||0) + 1; return `${base}|${seen[base]}`; };
+
+function render(text, sents){
+  let si = 0;
+  return text.trim().split(/\s+/).map(tok => {
+    const i = tok.indexOf("/");
+    if (i < 0) return `<ruby>${esc(tok.replace(/~/g," "))}<rt>&nbsp;</rt></ruby>`;
+    const src = tok.slice(0,i).replace(/~/g," "), gl = tok.slice(i+1).replace(/_/g," ");
+    const k = keyFor("w", src, gl);
+    words.push({k, src, gl});
+    let html = `<ruby class="w" data-k="${esc(k)}">${esc(src)}<rt>${esc(gl)}</rt></ruby>`;
+    if (sents && /[.?!]$/.test(src) && !/^\d+\.$/.test(src) && si < sents.length) {
+      const t = sents[si++], sk = keyFor("s", t, "");
+      sentences.push({k: sk, t});
+      html += ` <button class="sb" data-sk="${esc(sk)}" title="${esc(L.sentence)}">${esc(DATA.sentenceButton || "DE")}</button><span class="st" data-sk="${esc(sk)}">${esc(t)}</span>`;
+    }
+    return html;
+  }).join(" ");
+}
+
+document.getElementById("heading").textContent = DATA.heading || DATA.title;
+document.getElementById("out").innerHTML = DATA.sections.map(s =>
+  `<section>${s.label ? `<div class="page">${esc(s.label)}</div>` : ""}` +
+  s.blocks.map(b => b.type === "h" ? `<h2>${render(b.text)}</h2>` : `<p>${render(b.text, b.sentences)}</p>`).join("") +
+  `</section>`).join("");
+document.getElementById("reset").textContent = L.reset;
+document.getElementById("logTitle").textContent = L.logTitle;
+document.getElementById("logEmpty").textContent = L.logEmpty;
+
+// ---------- progress: {words:[{k,t}], sents:[{k,t}], resetAt} ----------
+const LS = "interlinear:" + (DATA.storageId || DATA.title);
+const ls = {
+  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} },
+};
+function merge(a, b){
+  const m = new Map();
+  for (const e of [...(a||[]), ...(b||[])]) if (e && e.k && (!m.has(e.k) || e.t < m.get(e.k).t)) m.set(e.k, e);
+  return [...m.values()].sort((x,y) => x.t - y.t);
+}
+let embedded = {};
+try { embedded = JSON.parse(document.getElementById("progress").textContent) || {}; } catch(e) {}
+const local = ls.get(LS) || {};
+const resetAt = Math.max(local.resetAt || 0, embedded.resetAt || 0);
+const after = list => (list||[]).filter(e => e.t > resetAt);
+
+// One-time migration from older position-based saves of the same text.
+let legacyW = [], legacyS = [];
+if (DATA.legacy) {
+  const ow = ls.get(DATA.legacy.wordsKey), os = ls.get(DATA.legacy.sentsKey);
+  if (Array.isArray(ow)) legacyW = ow.filter(e => words[e.id]).map(e => ({k: words[e.id].k, t: e.t}));
+  if (Array.isArray(os)) legacyS = os.filter(i => sentences[i]).map(i => ({k: sentences[i].k, t: resetAt + 1}));
+}
+
+const P = {
+  words: merge(merge(after(local.words), after(embedded.words)), legacyW),
+  sents: merge(merge(after(local.sents), after(embedded.sents)), legacyS),
+  resetAt,
+};
+
+// ---------- saving into the HTML file itself ----------
+const fileName = decodeURIComponent((location.pathname.split("/").pop() || "reader.html"));
+const canLink = "showSaveFilePicker" in window;
+let handle = null, needsGesture = false, writeTimer = null;
+const stateEl = document.getElementById("saveState"), saveBtn = document.getElementById("saveBtn");
+
+function idb(op, value){
+  return new Promise(res => {
+    try {
+      const r = indexedDB.open("interlinear-reader", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("handles");
+      r.onsuccess = () => {
+        const tx = r.result.transaction("handles", op === "get" ? "readonly" : "readwrite"), st = tx.objectStore("handles");
+        const q = op === "get" ? st.get(LS) : st.put(value, LS);
+        q.onsuccess = () => res(q.result); q.onerror = () => res(null);
+      };
+      r.onerror = () => res(null);
+    } catch(e) { res(null); }
+  });
+}
+function fileContents(){
+  const json = JSON.stringify(P).replace(/</g, "\\u003c");
+  return SOURCE.replace(/(<script type="application\/json" id="progress">)[\s\S]*?(<\/script>)/, (_, a, b) => a + json + b);
+}
+function showState(){
+  stateEl.className = "";
+  if (handle && !needsGesture) { stateEl.textContent = L.linked(handle.name); stateEl.className = "ok"; }
+  else if (handle) stateEl.textContent = L.relink(handle.name);
+  else stateEl.textContent = canLink ? L.browserOnly : L.downloadHint;
+  saveBtn.textContent = canLink ? L.link : L.download;
+  saveBtn.style.display = handle && !needsGesture ? "none" : "";
+}
+async function writeFile(){
+  if (!handle || needsGesture) return;
+  try { const w = await handle.createWritable(); await w.write(fileContents()); await w.close(); }
+  catch(e) { stateEl.textContent = L.saveError; stateEl.className = ""; }
+}
+function persist(){
+  ls.set(LS, P);
+  clearTimeout(writeTimer); writeTimer = setTimeout(writeFile, 300);
+}
+async function ensurePermission(){
+  if (!handle || !needsGesture) return;
+  try { needsGesture = (await handle.requestPermission({mode:"readwrite"})) !== "granted"; } catch(e) {}
+  showState(); if (!needsGesture) writeFile();
+}
+saveBtn.onclick = async () => {
+  if (!canLink) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([fileContents()], {type:"text/html"}));
+    a.download = fileName; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    return;
+  }
+  if (handle && needsGesture) return ensurePermission();
+  try {
+    handle = await showSaveFilePicker({suggestedName: fileName, types:[{description:"HTML", accept:{"text/html":[".html"]}}]});
+    needsGesture = false; await idb("put", handle); showState(); writeFile();
+  } catch(e) {}
+};
+showState();
+(async () => {
+  if (canLink) {
+    const h = await idb("get");
+    if (h) { handle = h; try { needsGesture = (await h.queryPermission({mode:"readwrite"})) !== "granted"; } catch(e) { needsGesture = true; } }
+  }
+  showState();
+})();
+document.addEventListener("click", ensurePermission, true);
+
+// ---------- UI ----------
+function update(){
+  const W = new Set(P.words.map(e => e.k)), S = new Set(P.sents.map(e => e.k));
+  document.querySelectorAll("ruby.w").forEach(r => r.classList.toggle("shown", W.has(r.dataset.k)));
+  document.querySelectorAll("[data-sk]").forEach(el => el.classList.toggle(el.tagName === "BUTTON" ? "done" : "shown", S.has(el.dataset.sk)));
+  document.getElementById("count").textContent = L.count(
+    words.filter(w => W.has(w.k)).length, words.length, sentences.filter(s => S.has(s.k)).length, sentences.length);
+  document.getElementById("logEmpty").style.display = P.words.length ? "none" : "";
+  document.getElementById("logList").innerHTML = P.words.map(e => {
+    const [, src, gl] = e.k.split("|");
+    const time = new Date(e.t).toLocaleString(DATA.locale || "de-DE", {day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"});
+    return `<li><b>${esc(clean(src))}</b> → <span>${esc(clean(gl))}</span> <small style="color:var(--muted)">${time}</small></li>`;
+  }).join("");
+}
+document.getElementById("out").addEventListener("click", ev => {
+  const b = ev.target.closest("button.sb");
+  if (b) { if (!P.sents.some(e => e.k === b.dataset.sk)) { P.sents.push({k: b.dataset.sk, t: Date.now()}); persist(); update(); } return; }
+  const r = ev.target.closest("ruby.w");
+  if (!r || P.words.some(e => e.k === r.dataset.k)) return;
+  P.words.push({k: r.dataset.k, t: Date.now()});
+  persist(); update();
+});
+document.getElementById("reset").onclick = () => {
+  if (!confirm(L.resetConfirm)) return;
+  P.words = []; P.sents = []; P.resetAt = Date.now();
+  persist(); update();
+};
+if (legacyW.length || legacyS.length) ls.set(LS, P);
+update();
+</script>
+</body>
+</html>

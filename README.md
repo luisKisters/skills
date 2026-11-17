@@ -55,3 +55,7 @@ If the CLI is unavailable, clone or download the repository and manually copy th
 ## t3-chat-audit
 
 `t3-chat-audit` audits all active T3 Code chats from the local state database, classifies stale chats (tests, greetings, duplicates, finished one-offs), applies hard safety gates such as no linked pull requests and no pending work, and archives only approved chats with a verified SQL update. An agent should trigger it when a user asks to review, tidy, prune, or archive their T3 Code chats or asks which chats are no longer needed. Install it with `npx skills add github.com/luisKisters/skills --skill t3-chat-audit`.
+
+## interlinear-reader
+
+`interlinear-reader` turns photos, scans or PDFs of a foreign-language text into one offline HTML file where clicking a word or short phrase reveals its translation above it and a button per sentence shows a natural full translation. An agent should trigger it when a user asks for a translation over every word, a click-to-reveal vocabulary reader, an interlinear or word-by-word translation, or wants to extend such a reader or restore its progress. Glosses are chunked so every reveal makes sense on its own, revealed items stay revealed with a timestamped log, and progress is saved in the browser and written back into the HTML file itself. Install it with `npx skills add github.com/luisKisters/skills --skill interlinear-reader`.

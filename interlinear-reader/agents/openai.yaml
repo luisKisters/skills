@@ -1,0 +1,4 @@
+interface:
+  display_name: "Interlinear Reader"
+  short_description: "Foreign-language text to a click-to-reveal word-by-word translation page"
+  default_prompt: "Use $interlinear-reader to turn this text into an HTML reader with a translation over every word."
