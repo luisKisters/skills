@@ -2,10 +2,21 @@
 One HTML file per design version: `design/mockup-vN/index.html`. Start from [../templates/mockup.html](../templates/mockup.html). Replace the app part. Keep the picker part.
 
 ## File
-- One file. Inline CSS and JS. No build, no server. It opens from disk.
+- One file. Inline CSS and JS. No build. It still opens from disk with no server. The link you send is the server URL (see "Serve and link").
 - Fonts by relative path to the repo (for example `../../Sources/App/Fonts/`), or system fonts.
 - Picks and toggles persist in `localStorage` under one key per version. "Reset demo data" makes the demo data new.
 - `#scene` in the URL opens a scene. `#scene&shot` hides the picker at scale 1, for screenshot scripts.
+
+## Serve and link
+Each time you make or change a mockup, serve it and send the user a link. Never send `open design/mockup-vN/index.html`.
+
+- Root: the folder that holds every relative path the mockup uses. Usually `design/`, so fonts at `../mockup-v3/fonts/` resolve. If the mockup uses repo paths (`../../Sources/App/Fonts/`), serve the repo root. The URL then starts with `/design/`.
+- Server: [../templates/serve.mjs](../templates/serve.mjs). Node, no dependencies, `cache-control: no-store`, 127.0.0.1 only. `node <skill>/templates/serve.mjs <root> [port]`. Without a port it takes the first free port from 4600. Run it in the background and keep it running while the round is open.
+- Fallback without Node: `python3 -m http.server <port> --bind 127.0.0.1 --directory <root>`. It caches, so tell the user to reload hard.
+- Reuse first. List the servers: `lsof -nP -iTCP -sTCP:LISTEN`. For each node port from 4600, `curl -s http://127.0.0.1:<port>/__designr` gives its root. If the root is the same folder, use that port. Do not start a second server.
+- A free port: pick one that `lsof -nP -iTCP:<port> -sTCP:LISTEN` does not list. Do not take a port another server uses.
+- Check before you send: `curl -s -o /dev/null -w '%{http_code}' <url>` gives 200 for the page and for one font or asset it loads.
+- Send the full link to the page, with the scene: `[Mockup v3, Busy evening](http://127.0.0.1:4600/mockup-v3/index.html#busy)`. Put it in your final message as a Markdown link.
 
 ## The app part (left)
 - The real window at real size (`DESK`), scaled to fit. The app then grows to fill the stage, so there is no empty space. Shots keep the exact `DESK` size. For a Mac app, add the macOS menu bar if the app uses it. Mark OS chrome with `data-os`, so the counter skips it.
