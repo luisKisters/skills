@@ -6,7 +6,9 @@ It triggers when you ask an agent to design or redesign an app, screen or style,
 
 When tasteskill (`design-taste-frontend`, tasteskill v2) is installed, designr loads it for the design read, the dials and the rules for each option. The user's picks and the locked design system win over it.
 
-It ships a starter mockup (`templates/mockup.html`), a decision log template, design system templates, and the Calendr design system as a filled example.
+Each time the agent makes or changes a mockup, it serves it with a tiny local server (`templates/serve.mjs`, Node, no dependencies, 127.0.0.1 only) and sends you a clickable link to the page and scene, for example `http://127.0.0.1:4600/mockup-v2/index.html#busy`. It reuses a running server for the same folder. The file still opens from disk.
+
+It ships a starter mockup (`templates/mockup.html`), a static server (`templates/serve.mjs`), a decision log template, design system templates, and the Calendr design system as a filled example.
 
 ## Install
 

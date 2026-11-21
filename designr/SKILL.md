@@ -26,13 +26,14 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
     - Every option works in the mockup. A description is not an option.
     - Give 2 to 5 options per decision. The first option is your recommendation.
     - Make each option with tasteskill's rules: its dials, no generic defaults, its type and colour rules. For app UI (a Mac app, a dashboard, a tool), use only its general rules; skip its website rules (photographs, one section per screen, hero, scroll effects).
-    - Tell the user how to open it (`open design/mockup-vN/index.html`) and what to look at.
+    - Serve it and send the link (rules: [references/mockup.md](references/mockup.md#serve-and-link)). Reuse a running designr server for the same folder. Else start one in the background: `node <skill>/templates/serve.mjs design`. It binds 127.0.0.1 and takes a free port.
+    - Check that the page and one font or asset return 200. Then put the full link to the page and scene in your message, as a Markdown link: `[Mockup v2, Busy evening](http://127.0.0.1:4600/mockup-v2/index.html#busy)`. Say what to look at. Do not tell the user to `open` the file.
 3. Round
     - The user clicks through, picks, and pastes the "Copy my picks" text with notes. Notes on one element come from Agentation (⌘⇧F in the mockup) with a CSS path.
     - Lock the picks: update `LOCKED` and the round section in `DECISIONS.md` ([templates/DECISIONS.md](templates/DECISIONS.md)).
     - Make new decisions only from the feedback. Quote the feedback word for word in the decision.
     - Fix bugs the user found without a decision. Write them under "Fixed without a decision".
-    - Commit the round. Repeat until nothing is open.
+    - Commit the round. Send the link again, to the scene that changed. Keep the server running while the round is open. Repeat until nothing is open.
 4. Clean-up into a design system
     - Turn on the counter. It shows the text sizes, colours and weights on screen.
     - Offer a clean-up decision with real options, for example "3 sizes only", "one text size in panels", "two greys".
@@ -68,6 +69,7 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
 | `design/mockup-vN/DECISIONS.md` | Every lock by round, replaced picks, fixes, the design system, the alignment result. |
 | `design-system/` | `README.md`, `foundations.md`, `components.md` (format in [references/design-system.md](references/design-system.md)). |
 | `design/mockup-vN/shots/` | PNG per scene, for the pixel compare. |
+| `templates/serve.mjs` (in the skill) | The static server for the link. Not copied into the project. |
 
 ## Check list before you hand a round to the user
 - [ ] Every open decision has 2 to 5 working options, a quote of the feedback and a scene.
@@ -78,4 +80,6 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
 - [ ] `LOCKED` and `DECISIONS.md` agree.
 - [ ] G shows no red box in the scenes you changed.
 - [ ] The file opens from disk with no server and no console error.
+- [ ] A designr server for the folder runs on 127.0.0.1. The page and a font or asset return 200.
+- [ ] Your message has the full http link to the page and scene, as a Markdown link, not an `open` command.
 - [ ] Your message says the round number, what is open and which scene to look at.
