@@ -17,7 +17,9 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
 
 ## Steps
 1. Brief
-    - Read the current UI, its theme code and earlier mockups or design docs. Take screenshots of the current app.
+    - Start from the base mockup: one mockup of the app as it is now (for example `design/current/`). If there is none, make it once from screenshots of the app.
+    - Build and run the default branch and take fresh screenshots of the screens you will change. Compare them with the base mockup and fix where they differ. Then make the options on top of the base.
+    - Read the theme code and the locked design file (for example `LOCKED.md`). Use earlier mockups only to see why a decision was made.
     - Ask only what changes the work: platform, window size, the screens, references the user likes.
     - Load tasteskill (skill `design-taste-frontend`, tasteskill v2). Write its one-line design read and the three dials. Put them in `READ` in the mockup. If it is not installed, give the install command once and go on: `npx skills add https://github.com/Leonxlnx/taste-skill --skill design-taste-frontend`.
     - Make a list of decisions: each element that has more than one good answer.
@@ -46,12 +48,14 @@ Design in rounds, in one interactive HTML mockup. You make real options. The use
     - Write the design system files: `design-system/README.md`, `foundations.md`, `components.md`. Take values from the mockup CSS and `DECISIONS.md` only.
     - Map each token to the code (theme file, colour, font, padding). Name the files to change.
     - Build from tokens only. If a value is missing, ask. Do not invent it.
+    - The PR that builds a locked round also updates the base mockup and the locked design file, so the next round starts from the app as it is then.
     - Use tasteskill only where the design system has no answer.
 7. Verify (details: [references/verify.md](references/verify.md))
     - Render each mockup scene and the same app state with the same demo data. Compare them side by side.
     - Run the project checks in `design-system/README.md`.
 
 ## Rules
+- One base mockup matches the app. Every round starts from it, never from an older mockup.
 - The mockup wins. If a text and the mockup disagree, the mockup is right.
 - Order of authority: the user's picks, the locked mockup, the design system, tasteskill, framework defaults.
 - A locked pick stays locked. Reopen it only when the user asks. Keep old options behind "Unlock to compare".
